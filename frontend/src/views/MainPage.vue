@@ -1,18 +1,7 @@
 <template>
-  <p>Set your name!</p>
-  <input placeholder="name" v-model="name" />
-  <input placeholder="age" v-model="age" />
-  <button type="button" @click ="add_data"> Add! </button>
-  <button type="button" @click ="get_data"> GET DATA! </button>
-  <p>{{ greeting }}</p>
-  <ul>
-    <li v-for="item in items" :key="item">{{ item }}</li>
-  </ul>
-  <div style="display : inline-block; background : black; width: 160px; height: 50px">
-
-  </div>
-
-  <button type="button" @click ="logout"> LOG OUT! </button>
+  <p>{{ name }}</p>
+  <button type="button" @click="logout"> LOG OUT! </button>
+  <button type="button" @click="del_user"> Delete account </button>
   <div>
     <SocketsChat/>
   </div>
@@ -25,39 +14,18 @@
 import { ref, onMounted } from 'vue'
 import router from '@/routes/routes.js'
 import SocketsChat from "@/components/SocketsChat.vue";
-const greeting = ref('')
+
 const name = ref('')
-const age = ref('')
-const items = ref(['Apple', 'Banana', 'Cherry', 'Date'])
 
 onMounted(() => {
   $.get('users/get_username', (resp) => {
-    greeting.value = "Hello " + resp
+    name.value = resp
   })
 })
 
 const props = defineProps({
   token : String
 })
-
-const get_data = () => {
-  $.get('/getusers'
-  , function (resp){
-      items.value = resp
-  })
-}
-
-
-const add_data = () => {
-  $.get('/add_new_user', {
-        'name' : name.value,
-        'age'  : age.value
-      }
-      , function (resp){
-        items.value = resp
-      })
-}
-
 
 const logout = () => {
   $.ajax({
@@ -68,6 +36,21 @@ const logout = () => {
     },
     success : () => {
         router.push('/login')
+    }
+  })
+}
+
+const del_user = () => {
+  $.ajax({
+    url : '/users/delete_user',
+    type : 'POST',
+    headers : {
+      'X-CSRF-Token': props.token
+    },
+    contentType: "text/plain",
+    data : name.value,
+    success : () => {
+      logout()
     }
   })
 }

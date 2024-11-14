@@ -1,9 +1,7 @@
 package com.example.backend.servicies;
 
 import com.example.backend.entities.User;
-import com.example.backend.exceptions.SameUserExistsException;
 import com.example.backend.repositories.UserRepository;
-import org.hibernate.PropertyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -41,5 +40,10 @@ public class UserService {
             return new ResponseEntity<>("Некорректные данные пользователей", HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>("Пользователь успешно создан!", HttpStatus.OK);
+    }
+
+    @Transactional
+    public void deleteUser(String username) {
+        userRepository.deleteByUsername(username);
     }
 }

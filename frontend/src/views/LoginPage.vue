@@ -45,7 +45,7 @@
           router.push("/greeting")
         },
         error: (resp) => {
-          message.value = resp.responseText
+          message.value = resp.responseJSON.responseText
         }
       })
     }
