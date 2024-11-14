@@ -43,6 +43,8 @@ function connect(onMessageReceived) {
     return new SockJS('/ws')
   });
 
+  stompClient.debug = function() {}
+
   stompClient.connect({}, () => {
     stompClient.subscribe('/topic/messages', (message) => {
       onMessageReceived(JSON.parse(message.body));

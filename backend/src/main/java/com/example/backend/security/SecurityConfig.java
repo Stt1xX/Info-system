@@ -34,7 +34,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/index.html", "/login", "/assets/**", "/app/csrf-token").permitAll()
+                        .requestMatchers("/index.html", "/assets/**").permitAll()
+                        .requestMatchers("/login","/registration","/users/add_new_user", "/app/csrf-token").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -57,9 +58,9 @@ public class SecurityConfig {
             }
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getUsername())
-                    .password(user.getPassword()) // пароль из базы данных
-                    .authorities(user.getAuthority()) // роль из базы данных
-                    .passwordEncoder(password -> password) // Применяем парольный кодировщик, если необходимо
+                    .password(user.getPassword())
+                    .authorities(user.getRole().name())
+                    .passwordEncoder(password -> password)
                     .build();
         };
     }

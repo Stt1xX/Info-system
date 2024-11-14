@@ -1,13 +1,12 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entities.Role;
+import com.example.backend.entities.User;
 import com.example.backend.servicies.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UserController {
 
@@ -19,8 +18,12 @@ public class UserController {
     }
 
     @GetMapping("/get_username")
-    @ResponseBody
     public String getUsername() {
         return userService.getCurrentUsername();
+    }
+
+    @PostMapping("/add_new_user")
+    public User addNewUser(@RequestBody User user) {
+        return userService.addUser(user);
     }
 }

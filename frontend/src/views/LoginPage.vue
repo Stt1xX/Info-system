@@ -1,6 +1,5 @@
 <template>
   <h1>Please Log In</h1>
-  <meta name="csrf-token" content="your-csrf-token-value">
   <form @submit.prevent="submitForm">
     <div>
       <input type="text" name="username" placeholder="Username" v-model="username"/>
@@ -13,11 +12,9 @@
   <div v-if="flag_reg === false">
     Попробуйте еще раз, неверный логин или пароль
   </div>
-
-  <p>
-    {{ username }}
-    {{ password }}
-  </p>
+  <div>
+    <input type="button" @click="router.push('/registration')" value="Registration">
+  </div>
 </template>
 
 <script setup>

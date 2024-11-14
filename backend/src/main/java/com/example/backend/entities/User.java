@@ -1,5 +1,6 @@
 package com.example.backend.entities;
 
+import com.example.backend.security.Sha256PasswordEncoder;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,8 +18,9 @@ public class User {
     @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)
     private String password;
 
-    @Column(name = "authority", nullable = false, length = Integer.MAX_VALUE)
-    private String authority;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
 
     public Integer getId() {
         return id;
@@ -41,15 +43,15 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = new Sha256PasswordEncoder().encode(password);
     }
 
-    public String getAuthority() {
-        return authority;
+    public Role getRole() {
+        return role;
     }
 
-    public void setAuthority(String authority) {
-        this.authority = authority;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
 }
