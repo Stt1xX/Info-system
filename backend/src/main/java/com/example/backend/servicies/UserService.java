@@ -1,8 +1,13 @@
 package com.example.backend.servicies;
 
 import com.example.backend.entities.User;
+import com.example.backend.exceptions.SameUserExistsException;
 import com.example.backend.repositories.UserRepository;
+import org.hibernate.PropertyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +31,15 @@ public class UserService {
         return null;
     }
 
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public ResponseEntity<?> addUser(User user) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            return new ResponseEntity<>("Пользователь с таким именем уже существует", HttpStatus.CONFLICT);
+        }
+        try{
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>("Некорректные данные пользователей", HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>("Пользователь успешно создан!", HttpStatus.OK);
     }
 }

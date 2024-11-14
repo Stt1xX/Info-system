@@ -8,28 +8,24 @@
   </div>
 </template>
 
-
 <script setup>
+
 import { ref, onMounted } from 'vue';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 
-
 const message = ref('');
 const messages = ref([]);
 
-// Функция для отправки сообщения
 const sendMessageHandler = () => {
   sendMessage(message.value);
   message.value = '';
 };
 
-// Функция для обработки полученных сообщений
 const onMessageReceived = (msg) => {
   messages.value = msg;
 };
 
-// Подключение к WebSocket при монтировании компонента
 onMounted(() => {
   connect(onMessageReceived);
 });
@@ -43,7 +39,7 @@ function connect(onMessageReceived) {
     return new SockJS('/ws')
   });
 
-  stompClient.debug = function() {}
+  // stompClient.debug = function() {} on release uncomment
 
   stompClient.connect({}, () => {
     stompClient.subscribe('/topic/messages', (message) => {

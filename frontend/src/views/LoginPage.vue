@@ -9,8 +9,8 @@
     </div>
     <input type="submit" value="Log in" />
   </form>
-  <div v-if="flag_reg === false">
-    Попробуйте еще раз, неверный логин или пароль
+  <div v-if="message !== ''">
+    {{message}}
   </div>
   <div>
     <input type="button" @click="router.push('/registration')" value="Registration">
@@ -23,7 +23,7 @@
   import router from "@/routes/routes.js"
   const username = ref()
   const password = ref()
-  const flag_reg = ref(true)
+  const message = ref('')
 
   const props = defineProps({
     token : String
@@ -40,16 +40,12 @@
           "username" : username.value,
           "password" : password.value
         },
-        success: function(response) {
-          switch (response.status){
-            case  "success":
-              router.push('/greeting')
-              flag_reg.vale = true
-              break
-            case "unauthorized":
-              flag_reg.value = false;
-              break
-          }
+        success: () => {
+          message.value = ''
+          router.push("/greeting")
+        },
+        error: (resp) => {
+          message.value = resp.responseText
         }
       })
     }

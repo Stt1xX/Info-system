@@ -16,7 +16,9 @@
     </div>
     <input type="submit" value="Registry"/>
   </form>
-
+  <div v-if="message !== ''">
+    {{message}}
+  </div>
 </template>
 
 
@@ -29,27 +31,33 @@
   const password = ref()
   const role = ref()
 
+  const message = ref('')
+
   const props = defineProps({
     token : String
   })
 
   const submit_form = () => {
-    $.ajax({
-      type: "POST",
-      url: "/users/add_new_user",
-      headers: {
-        'X-CSRF-Token': props.token
-      },
-      contentType: "application/json",
-      data: JSON.stringify({
-        "username": username.value,
-        "password": password.value,
-        "role": role.value
-      }),
-      success : () => {
-        router.push("/login")
-      }
-    })
+      $.ajax({
+        type: "POST",
+        url: "/users/add_new_user",
+        headers: {
+          'X-CSRF-Token': props.token
+        },
+        contentType: "application/json",
+        data: JSON.stringify({
+          "username": username.value,
+          "password": password.value,
+          "role": role.value
+        }),
+        success: () => {
+          message.value = ''
+          router.push("/login")
+        },
+        error: (resp) => {
+          message.value = resp.responseText
+        }
+      })
   }
 </script>
 
