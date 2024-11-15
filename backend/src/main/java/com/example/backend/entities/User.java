@@ -1,5 +1,6 @@
 package com.example.backend.entities;
 
+import com.example.backend.entities.enums.Role;
 import com.example.backend.security.Sha256PasswordEncoder;
 import jakarta.persistence.*;
 
