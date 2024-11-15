@@ -17,9 +17,9 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/get_username")
-    public String getUsername() {
-        return userService.getCurrentUsername();
+    @GetMapping("/get_user_info")
+    public ResponseEntity<?> getUsername() {
+        return userService.getUserInfo();
     }
 
     @PostMapping("/add_new_user")
@@ -29,8 +29,6 @@ public class UserController {
 
     @PostMapping("/delete_user")
     public void deleteUser(@RequestBody String username) {
-        System.out.println(username);
-        System.out.println();
         userService.deleteUser(username);
     }
 }

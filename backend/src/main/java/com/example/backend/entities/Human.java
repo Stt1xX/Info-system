@@ -37,7 +37,8 @@ public class Human {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @Column(name = "mood", columnDefinition = "mood not null")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mood", nullable = false)
     private Mood mood;
 
     @Column(name = "impact_speed", nullable = false)
@@ -49,7 +50,8 @@ public class Human {
     @Column(name = "minutes_of_waiting")
     private Integer minutesOfWaiting;
 
-    @Column(name = "weapon_type", columnDefinition = "weapon_type not null")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "weapon_type", nullable = false)
     private WeaponType weaponType;
 
     public Integer getId() {

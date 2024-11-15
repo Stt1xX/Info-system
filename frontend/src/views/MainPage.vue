@@ -2,10 +2,9 @@
   <p>{{ name }}</p>
   <button type="button" @click="logout"> LOG OUT! </button>
   <button type="button" @click="del_user"> Delete account </button>
-  <div>
-    <SocketsChat/>
+  <div v-if="admin_role">
+    <RegRequests/>
   </div>
-
 
 </template>
 
@@ -13,13 +12,15 @@
 
 import { ref, onMounted } from 'vue'
 import router from '@/routes/routes.js'
-import SocketsChat from "@/components/SocketsChat.vue";
+import RegRequests from "@/components/RegRequests.vue";
 
 const name = ref('')
+const admin_role = ref()
 
 onMounted(() => {
-  $.get('users/get_username', (resp) => {
-    name.value = resp
+  $.get('users/get_user_info', (resp) => {
+    name.value = resp.username
+    admin_role.value = resp.admin_role
   })
 })
 
@@ -54,6 +55,7 @@ const del_user = () => {
     }
   })
 }
+
 
 </script>
 

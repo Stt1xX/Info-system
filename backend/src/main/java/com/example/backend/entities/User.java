@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_gen")
     @SequenceGenerator(name = "users_id_gen", sequenceName = "users_id_seq", allocationSize = 1)
@@ -45,6 +46,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = new Sha256PasswordEncoder().encode(password);
+    }
+
+    public void setPasswordWithoutEncode(String password) {
+        this.password = password;
     }
 
     public Role getRole() {

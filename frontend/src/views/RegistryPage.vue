@@ -15,10 +15,12 @@
       </select>
     </div>
     <input type="submit" value="Registry"/>
+    <input type="button" @click="router.push('/login')" value="Login">
   </form>
   <div v-if="message !== ''">
     {{message}}
   </div>
+
 </template>
 
 
@@ -50,9 +52,8 @@
           "password": password.value,
           "role": role.value
         }),
-        success: () => {
-          message.value = ''
-          router.push("/login")
+        success: (resp) => {
+          message.value = resp
         },
         error: (resp) => {
           message.value = resp.responseText
