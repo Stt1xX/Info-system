@@ -29,12 +29,13 @@ public enum Mood {
     LONGING,
     GLOOM,
     CALM,
-    FRENZY;
+    FRENZY
 }
 public enum WeaponType {
     SHOTGUN,
     KNIFE,
     BAT
+}
 ```
 
 Разработанная система должна удовлетворять следующим требованиям:
