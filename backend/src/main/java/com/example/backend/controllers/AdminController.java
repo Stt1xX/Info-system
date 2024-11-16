@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 @Controller
-//@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
 
     private final RequestService requestService;
