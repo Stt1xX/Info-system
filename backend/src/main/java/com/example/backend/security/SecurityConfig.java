@@ -36,7 +36,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/index.html", "/assets/**").permitAll()
-                        .requestMatchers("/login","/registration","/users/add_new_user", "/app/csrf-token").permitAll()
+                        .requestMatchers("/login","/registration","/users/add_new_user", "/app/csrf-token", "/error/**").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -46,7 +47,8 @@ public class SecurityConfig {
                         .successHandler(successHandler)
                         .failureHandler(failureHandler)
                 )
-                .exceptionHandling(handler -> handler.accessDeniedHandler(new CustomAccessDeniedHandler()));
+                .exceptionHandling(handler ->
+                        handler.accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
     }

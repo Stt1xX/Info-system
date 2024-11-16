@@ -4,6 +4,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,22 +12,13 @@ import java.util.List;
 @Controller
 public class MyController {
 
-    private final List<String> strs;
-
-
-    public MyController() {
-        strs = new ArrayList<>();
-    }
-
-    @GetMapping({"/login", "/greeting", "/registration"})
-    public String login() {
+    @GetMapping({"/login", "/greeting", "/registration", "/admin/messages"})
+    public String mainPage() {
         return "forward:/index.html";
     }
 
-    @MessageMapping("/message")
-    @SendTo("/topic/messages")
-    public List<String> handleMessage(String message) {
-        strs.add(message);
-        return strs;
+    @GetMapping({"/error", "/error/**"})
+    public String errorPage() {
+        return "forward:/index.html";
     }
 }

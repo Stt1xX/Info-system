@@ -10,8 +10,13 @@
 <script setup>
 import router from '@/routes/routes.js'
 
+const props = defineProps({
+  is_admin: Boolean
+})
+
 const navigateToRequests = () => {
-  router.push('/requests')
+  if (props.is_admin) router.push("/admin/messages")
+  else router.push("/error/ErrorPage?message=403")
 }
 </script>
 
