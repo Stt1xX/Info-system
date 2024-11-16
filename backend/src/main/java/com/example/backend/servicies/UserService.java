@@ -51,6 +51,9 @@ public class UserService {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             return new ResponseEntity<>("Пользователь с таким именем уже существует", HttpStatus.CONFLICT);
         }
+        if (requestService.getRequestByUsername(user.getUsername()) != null) {
+            return new ResponseEntity<>("Запрос с таким именем уже существует", HttpStatus.CONFLICT);
+        }
         try{
             if (user.getRole() == Role.ADMIN && !userRepository.findByRole(user.getRole()).isEmpty()) {
                 return requestService.addRequest(new Request(user.getUsername(), user.getPassword()));

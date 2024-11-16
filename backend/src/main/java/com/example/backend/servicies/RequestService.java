@@ -75,6 +75,10 @@ public class RequestService {
                 .collect(Collectors.toList());
     }
 
+    public Request getRequestByUsername(String username) {
+        return requestRepository.findByUsername(username);
+    }
+
     public void notifyAdminsAboutNewRequest() {
         messagingTemplate.convertAndSend("/topic/reg_requests", getAllRequests());
 
