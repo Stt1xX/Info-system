@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer">
+  <footer class="footer bg-gray-800 text-white">
     <p>&copy; 2024 Stt1xX Company. All rights reserved.</p>
   </footer>
 </template>
@@ -9,12 +9,6 @@
 
 <style scoped>
 .footer {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 20px 0;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
+  @apply text-center p-4;
 }
 </style>

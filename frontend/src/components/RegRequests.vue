@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <button class="btn" type="button" @click="get">Сообщения</button>
+    <button class="btn" type="button" @click="messages.value = null">Скрыть</button>
     <div v-for="message in messages" :key="message.id" class="message">
       <p>{{ message.id }} : {{ message.username }} : {{ message.date }}</p>
       <div class="actions">
@@ -8,7 +9,6 @@
         <button class="btn reject" type="button" @click="reject(message.id)">Отклонить</button>
       </div>
     </div>
-    <button class="btn" type="button" @click="messages.value = null">Скрыть</button>
   </div>
 </template>
 
@@ -59,6 +59,7 @@ function reject(id) {
     stompClient.send("/app/reject", {}, id);
   }
 }
+
 </script>
 
 <style scoped>
