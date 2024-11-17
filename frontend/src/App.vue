@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <Header v-if="flag_header" :username="username" :admin_role="admin_role"/>
-    <RouterView/>
+    <Header @logout="get_token" v-if="currentPath" :token="token"/>
+    <router-view @logined="get_token" :token="token"/>
     <Footer/>
   </div>
 </template>
@@ -10,32 +10,34 @@
   import Footer from "@/components/Footer.vue";
   import Header from "@/components/Header.vue";
 
-  import {onMounted, provide, ref} from 'vue';
+  import {onMounted, ref, watch} from 'vue';
+  import {useRoute} from "vue-router";
 
-  const username = ref()
-  const flag_header = ref(false)
-  const admin_role = ref()
 
-  onMounted(() => {
-    get_user_info()
+  const route = useRoute();
+  const token = ref();
+  const currentPath = ref(false);
+  watch(
+      () => route.path,
+      (newPath) => {
+        currentPath.value = !(newPath === '/login' ||
+            newPath === '/registration' || newPath === '/error/ErrorPage');
+      }
+  );
+
+  const get_token = () => {
+      $.ajax({
+        type: "GET",
+        url: "/app/csrf-token",
+        success: function (response) {
+          token.value =response.csrfToken
+        }
+    });
+  }
+
+  onMounted( () => {
+    get_token()
   })
-
-  function get_user_info() {
-    $.get('/users/get_user_info', (resp) => {
-      username.value = resp.username
-      admin_role.value = resp.admin_role
-    })
-    flag_header.value = true;
-  }
-
-  function logout() {
-    flag_header.value = false
-    username.value = null
-    admin_role.value = null
-  }
-
-  provide('get_user_info', get_user_info)
-  provide('logout', logout)
 </script>
 
 <style scoped>

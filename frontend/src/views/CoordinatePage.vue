@@ -7,9 +7,5 @@
 </template>
 
 <script setup>
-import Header from "@/components/Header.vue"
 
-const props = defineProps({
-  token: String
-})
 </script>

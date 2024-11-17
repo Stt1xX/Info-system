@@ -36,10 +36,6 @@ import SockJS from "sockjs-client";
 const messages = ref([]);
 let stompClient = null;
 
-const props = defineProps({
-  token: String,
-});
-
 onMounted(() => {
   connect(get_reg_requests);
 });

@@ -10,8 +10,8 @@
       <CarTableButton />
       <CoordinateTableButton />
       <RequestsButton v-if="admin_role" :is_admin="admin_role" />
-      <LogoutButton :token="token" />
-      <DeleteAccountButton :token="token" :username="username" />
+      <LogoutButton @logout="intermediateEmit" :token="token" />
+      <DeleteAccountButton @logout="intermediateEmit" :token="token" :username="username" />
     </div>
   </header>
 </template>
@@ -24,12 +24,31 @@ import CarTableButton from "@/components/buttons/CarTableButton.vue";
 import HumanTableButton from "@/components/buttons/HumanTableButton.vue";
 import CoordinateTableButton from "@/components/buttons/CoordinateTableButton.vue";
 import GhostLogo from "@/components/GhostLogo.vue";
+import {onMounted, ref} from "vue";
+
+const username = ref()
+const admin_role = ref()
+
+const emit = defineEmits()
+
+const intermediateEmit = () => {
+  emit('logout')
+}
 
 const props = defineProps({
   token: String,
-  username : String,
-  admin_role : Boolean
 });
+
+onMounted(() => {
+  get_user_info()
+})
+
+function get_user_info() {
+  $.get('/users/get_user_info', (resp) => {
+    username.value = resp.username
+    admin_role.value = resp.admin_role
+  })
+}
 </script>
 
 <style scoped>

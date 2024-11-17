@@ -8,15 +8,15 @@
 </template>
 
 <script setup>
-import {defineProps, inject} from 'vue'
+import {defineProps} from 'vue'
 import router from '@/routes/routes.js'
-
-const logout = inject('logout')
 
 const props = defineProps({
   token: String,
   username: String
 })
+
+const emit = defineEmits()
 
 const del_user = () => {
   $.ajax({
@@ -35,8 +35,8 @@ const del_user = () => {
           'X-CSRF-Token': props.token
         },
         success: () => {
-          logout()
           router.push('/login')
+          emit('logout')
         }
       })
     }

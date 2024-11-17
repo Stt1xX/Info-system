@@ -9,12 +9,12 @@ import CoordinatePage from "@/views/CoordinatePage.vue";
 import CarPage from "@/views/CarPage.vue";
 
 const routes = [
-    {path: "/humanTable", component: HumanPage, props: (route) => ({ token: route.meta.token })},
-    {path: "/coordinateTable", component: CoordinatePage, props: (route) => ({ token: route.meta.token })},
-    {path: "/carTable", component: CarPage, props: (route) => ({ token: route.meta.token })},
-    {path: "/login", component: LoginPage, props: (route) => ({ token: route.meta.token })},
-    {path: "/registration", component: RegistryPage, props: (route) => ({ token: route.meta.token })},
-    {path: "/admin/messages", component: MessagesPage, props: (route) => ({ token: route.meta.token })},
+    {path: "/humanTable", component: HumanPage},
+    {path: "/coordinateTable", component: CoordinatePage},
+    {path: "/carTable", component: CarPage},
+    {path: "/login", component: LoginPage},
+    {path: "/registration", component: RegistryPage},
+    {path: "/admin/messages", component: MessagesPage},
     {path: "/error/ErrorPage", component: ErrorPage },
     {path: "/", redirect: {path: "/humanTable"}},
     {
@@ -28,17 +28,17 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach(async (to, from, next) => {
-    to.meta.token = await new Promise((resolve) => {
-        $.ajax({
-            type: "GET",
-            url: "/app/csrf-token",
-            success: function (response) {
-                resolve(response.csrfToken)
-            }
-        })
-    });
-    next();
-})
+    // router.beforeEach(async (to, from, next) => {
+    //     to.meta.token = await new Promise((resolve) => {
+    //         $.ajax({
+    //             type: "GET",
+    //             url: "/app/csrf-token",
+    //             success: function (response) {
+    //                 resolve(response.csrfToken)
+    //             }
+    //         })
+    //     });
+    //     next();
+    // })
 
 export default router;

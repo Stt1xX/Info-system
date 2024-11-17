@@ -34,19 +34,9 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue'
+import {ref} from 'vue'
 import { useRouter } from 'vue-router'
 import GhostLogo from "@/components/GhostLogo.vue";
-
-import { inject } from 'vue';
-
-// Получаем метод родителя
-const get_user_info = inject('get_user_info');
-const logout = inject('logout');
-
-onMounted(() => {
-  logout()
-})
 
 const username = ref('')
 const password = ref('')
@@ -55,6 +45,8 @@ const usernameError = ref('')
 const passwordError = ref('')
 
 const router = useRouter()
+
+const emit = defineEmits()
 
 const props = defineProps({
   token: String
@@ -96,10 +88,8 @@ const submitForm = () => {
     },
     success: () => {
       message.value = ''
+      emit('logined')
       router.push("/humanTable")
-      if (get_user_info) {
-        get_user_info();
-      }
     },
     error: (resp) => {
       message.value = resp.responseJSON.responseText

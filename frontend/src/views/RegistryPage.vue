@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import {inject, onMounted, ref} from 'vue'
+import {ref} from 'vue'
 import { useRouter } from 'vue-router'
 import GhostLogo from "@/components/GhostLogo.vue";
 
@@ -55,16 +55,9 @@ const passwordError = ref('')
 const roleError = ref('')
 
 const router = useRouter()
-const emit = defineEmits(['update:username'])
 
 const props = defineProps({
   token: String
-})
-
-const logout = inject('logout');
-
-onMounted(() => {
-  logout()
 })
 
 const validateForm = () => {
@@ -111,7 +104,6 @@ const submit_form = () => {
     }),
     success: (resp) => {
       message.value = resp
-      emit('update:username', username.value)
     },
     error: (resp) => {
       message.value = resp.responseText
