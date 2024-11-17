@@ -18,15 +18,16 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue'
+import {inject, onMounted, ref} from 'vue'
 import { useRoute } from 'vue-router'
 import Footer from "@/components/Footer.vue";
 import GhostLogo from "@/components/GhostLogo.vue";
-
+const logout = inject('logout')
 const route = useRoute()
 const error_code = decodeURIComponent(route.query.message)
 const errorMessage = ref('')
 onMounted(() => {
+  logout()
   switch (error_code){
     case '403':
       errorMessage.value = 'You do not have permission to view this page.'

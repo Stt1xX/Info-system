@@ -1,18 +1,22 @@
 import {createRouter, createWebHistory} from "vue-router";
 
-import LoginPage from '../views/LoginPage.vue'
-import MainPage from '../views/MainPage.vue'
+import LoginPage from '@/views/LoginPage.vue'
 import RegistryPage from "@/views/RegistryPage.vue";
 import MessagesPage from "@/views/MessagesPage.vue";
 import ErrorPage from "@/errors/ErrorPage.vue";
+import HumanPage from "@/views/HumanPage.vue";
+import CoordinatePage from "@/views/CoordinatePage.vue";
+import CarPage from "@/views/CarPage.vue";
 
 const routes = [
-    {path: "/greeting", component: MainPage, props: (route) => ({ token: route.meta.token })},
+    {path: "/humanTable", component: HumanPage, props: (route) => ({ token: route.meta.token })},
+    {path: "/coordinateTable", component: CoordinatePage, props: (route) => ({ token: route.meta.token })},
+    {path: "/carTable", component: CarPage, props: (route) => ({ token: route.meta.token })},
     {path: "/login", component: LoginPage, props: (route) => ({ token: route.meta.token })},
     {path: "/registration", component: RegistryPage, props: (route) => ({ token: route.meta.token })},
     {path: "/admin/messages", component: MessagesPage, props: (route) => ({ token: route.meta.token })},
     {path: "/error/ErrorPage", component: ErrorPage },
-    {path: "/", redirect: {path: "/greeting"}},
+    {path: "/", redirect: {path: "/humanTable"}},
     {
         path: '/:pathMatch(.*)*',
         redirect: '/error/ErrorPage?message=404',

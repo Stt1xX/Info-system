@@ -38,14 +38,12 @@
         </div>
       </div>
     </div>
-    <Footer />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import {inject, onMounted, ref} from 'vue'
 import { useRouter } from 'vue-router'
-import Footer from '@/components/Footer.vue';
 import GhostLogo from "@/components/GhostLogo.vue";
 
 const username = ref('')
@@ -61,6 +59,12 @@ const emit = defineEmits(['update:username'])
 
 const props = defineProps({
   token: String
+})
+
+const logout = inject('logout');
+
+onMounted(() => {
+  logout()
 })
 
 const validateForm = () => {

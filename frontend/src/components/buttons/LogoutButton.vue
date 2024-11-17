@@ -8,9 +8,9 @@
 </template>
 
 <script setup>
-import {defineProps} from 'vue'
+import {defineProps, inject} from 'vue'
 import router from '@/routes/routes.js'
-
+const logout_header = inject('logout')
 const props = defineProps({
   token: String
 })
@@ -23,6 +23,7 @@ const logout = () => {
       'X-CSRF-Token': props.token
     },
     success: () => {
+      logout_header()
       router.push('/login')
     }
   })

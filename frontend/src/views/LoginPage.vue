@@ -30,15 +30,23 @@
         </div>
       </div>
     </div>
-    <Footer />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import { useRouter } from 'vue-router'
-import Footer from "@/components/Footer.vue";
 import GhostLogo from "@/components/GhostLogo.vue";
+
+import { inject } from 'vue';
+
+// Получаем метод родителя
+const get_user_info = inject('get_user_info');
+const logout = inject('logout');
+
+onMounted(() => {
+  logout()
+})
 
 const username = ref('')
 const password = ref('')
@@ -88,7 +96,10 @@ const submitForm = () => {
     },
     success: () => {
       message.value = ''
-      router.push("/greeting")
+      router.push("/humanTable")
+      if (get_user_info) {
+        get_user_info();
+      }
     },
     error: (resp) => {
       message.value = resp.responseJSON.responseText

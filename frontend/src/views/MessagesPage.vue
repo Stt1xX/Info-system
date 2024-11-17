@@ -1,12 +1,11 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gray-900 text-white">
-    <Header :token="token" />
     <main class="flex-grow container mx-auto p-8">
       <h1 class="text-2xl font-bold mb-6 text-center">Requests</h1>
       <div class="bg-gray-800 p-12 rounded-lg shadow-lg max-w-4xl mx-auto">
         <div class="grid grid-cols-2 gap-4">
           <div v-if="messages.length === 0" class="col-span-2 text-center text-xl">
-            Тут пока тихо...
+            It's quiet here so far...
           </div>
           <div v-for="message in messages" :key="message.id" class="bg-gray-700 p-6 rounded flex justify-between items-center">
             <p>№ : {{ message.id }}<br>Username : {{ message.username }}<br>Date : {{ message.date }}</p>
@@ -26,7 +25,6 @@
         </div>
       </div>
     </main>
-    <Footer />
   </div>
 </template>
 
@@ -34,8 +32,6 @@
 import {onMounted, ref} from "vue";
 import {Stomp} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
 
 const messages = ref([]);
 let stompClient = null;

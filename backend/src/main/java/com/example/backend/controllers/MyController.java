@@ -12,7 +12,8 @@ import java.util.List;
 @Controller
 public class MyController {
 
-    @GetMapping({"/login", "/greeting", "/registration", "/admin/messages"})
+    @GetMapping({"/login", "/registration", "/admin/messages",
+    "/humanTable", "/coordinateTable", "/carTable"})
     public String mainPage() {
         return "forward:/index.html";
     }
