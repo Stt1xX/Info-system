@@ -45,7 +45,7 @@ const get_reg_requests = (data) => {
 };
 
 const connect = (onMessageReceived) => {
-  stompClient = Stomp.over(() => new SockJS("/ws"));
+  stompClient = Stomp.over(() => new SockJS('http://localhost:8080/ws'));
   stompClient.connect({}, () => {
     get();
     stompClient.subscribe("/topic/reg_requests", (message) => {

@@ -9,7 +9,7 @@
       <HumanTableButton />
       <CarTableButton />
       <CoordinateTableButton />
-      <RequestsButton v-if="admin_role" :is_admin="admin_role" />
+      <RequestsButton :is_admin="admin_role" />
       <LogoutButton @logout="intermediateEmit" :token="token" />
       <DeleteAccountButton @logout="intermediateEmit" :token="token" :username="username" />
     </div>

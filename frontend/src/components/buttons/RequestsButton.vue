@@ -15,8 +15,9 @@ const props = defineProps({
 })
 
 const navigateToRequests = () => {
-  if (props.is_admin) router.push("/admin/messages")
-  else router.push("/error/ErrorPage?message=403")
+  // if (props.is_admin)
+    router.push("/admin/messages")
+  // else router.push("/error/ErrorPage?message=403")
 }
 </script>
 

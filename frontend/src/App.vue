@@ -9,10 +9,8 @@
 <script setup>
   import Footer from "@/components/Footer.vue";
   import Header from "@/components/Header.vue";
-
   import {onMounted, ref, watch} from 'vue';
   import {useRoute} from "vue-router";
-
 
   const route = useRoute();
   const token = ref();

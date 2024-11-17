@@ -19,8 +19,8 @@
             <div class="form-group">
               <label for="role" class="block mb-2 text-center">Select your role:</label>
               <select v-model="role" name="role" class="form-control w-full p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="USER">USER</option>
-                <option value="ADMIN">ADMIN</option>
+                <option value="ROLE_USER">USER</option>
+                <option value="ROLE_ADMIN">ADMIN</option>
               </select>
               <div v-if="roleError" class="warning text-red-500 mt-2">{{ roleError }}</div>
             </div>
