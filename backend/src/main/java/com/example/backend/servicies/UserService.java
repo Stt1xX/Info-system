@@ -3,7 +3,6 @@ package com.example.backend.servicies;
 import com.example.backend.entities.Request;
 import com.example.backend.entities.User;
 import com.example.backend.entities.enums.Role;
-import com.example.backend.repositories.RequestRepository;
 import com.example.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -42,7 +40,7 @@ public class UserService {
     public Boolean isAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
-            return Role.ADMIN == Role.valueOf(userDetails.getAuthorities().stream().toList().get(0).toString());
+            return Role.ROLE_ADMIN == Role.valueOf(userDetails.getAuthorities().stream().toList().get(0).toString());
         }
         return false;
     }
@@ -55,7 +53,7 @@ public class UserService {
             return new ResponseEntity<>("Запрос с таким именем уже существует", HttpStatus.CONFLICT);
         }
         try{
-            if (user.getRole() == Role.ADMIN && !userRepository.findByRole(user.getRole()).isEmpty()) {
+            if (user.getRole() == Role.ROLE_ADMIN && !userRepository.findByRole(user.getRole()).isEmpty()) {
                 return requestService.addRequest(new Request(user.getUsername(), user.getPassword()));
             }
             userRepository.save(user);
