@@ -36,7 +36,7 @@
 <script setup>
 import {ref} from 'vue'
 import { useRouter } from 'vue-router'
-import GhostLogo from "@/components/GhostLogo.vue";
+import GhostLogo from "@/components/logos/GhostLogo.vue";
 
 const username = ref('')
 const password = ref('')

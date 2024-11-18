@@ -19,7 +19,7 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import { useRoute } from 'vue-router'
-import GhostLogo from "@/components/GhostLogo.vue";
+import GhostLogo from "@/components/logos/GhostLogo.vue";
 const route = useRoute()
 const error_code = decodeURIComponent(route.query.error_code)
 const errorMessage = ref('An error occurred.')

@@ -11,7 +11,7 @@
       <CoordinateTableButton />
       <RequestsButton v-if="admin_role" :is_admin="admin_role" />
       <LogoutButton @logout="intermediateEmit" :token="token" />
-      <DeleteAccountButton @logout="intermediateEmit" :token="token" :username="username" />
+      <DeleteAccountButton @logout="intermediateEmit" :token="token" />
     </div>
   </header>
 </template>
@@ -23,7 +23,7 @@ import RequestsButton from "@/components/buttons/RequestsButton.vue"
 import CarTableButton from "@/components/buttons/CarTableButton.vue";
 import HumanTableButton from "@/components/buttons/HumanTableButton.vue";
 import CoordinateTableButton from "@/components/buttons/CoordinateTableButton.vue";
-import GhostLogo from "@/components/GhostLogo.vue";
+import GhostLogo from "@/components/logos/GhostLogo.vue";
 import {onMounted, ref} from "vue";
 
 const username = ref()

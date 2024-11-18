@@ -13,7 +13,6 @@ import router from '@/routes/routes.js'
 
 const props = defineProps({
   token: String,
-  username: String
 })
 
 const emit = defineEmits()
@@ -26,7 +25,6 @@ const del_user = () => {
       'X-CSRF-Token': props.token
     },
     contentType: "text/plain",
-    data: props.username,
     success: () => {
       $.ajax({
         url: '/logout',
