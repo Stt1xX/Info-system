@@ -9,7 +9,7 @@
       <HumanTableButton />
       <CarTableButton />
       <CoordinateTableButton />
-      <RequestsButton :is_admin="admin_role" />
+      <RequestsButton v-if="admin_role" :is_admin="admin_role" />
       <LogoutButton @logout="intermediateEmit" :token="token" />
       <DeleteAccountButton @logout="intermediateEmit" :token="token" :username="username" />
     </div>
@@ -44,11 +44,19 @@ onMounted(() => {
 })
 
 function get_user_info() {
-  $.get('/users/get_user_info', (resp) => {
-    username.value = resp.username
-    admin_role.value = resp.admin_role
+  $.ajax({
+    type: 'GET',
+    url : '/users/get_user_info',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    success : (resp) => {
+      username.value = resp.username
+      admin_role.value = resp.admin_role
+    }
   })
 }
+
 </script>
 
 <style scoped>

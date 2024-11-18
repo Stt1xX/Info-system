@@ -88,7 +88,7 @@ const submitForm = () => {
     },
     success: () => {
       message.value = ''
-      emit('logined')
+      emit('logged')
       router.push("/humanTable")
     },
     error: (resp) => {

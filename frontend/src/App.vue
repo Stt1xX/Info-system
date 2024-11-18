@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <Header @logout="get_token" v-if="currentPath" :token="token"/>
-    <router-view @logined="get_token" :token="token"/>
+    <Header @logout="logout" v-if="currentAuth" :token="token"/>
+    <router-view @logged="logged" :token="token"/>
     <Footer/>
   </div>
 </template>
@@ -9,19 +9,28 @@
 <script setup>
   import Footer from "@/components/Footer.vue";
   import Header from "@/components/Header.vue";
-  import {onMounted, ref, watch} from 'vue';
+  import { onMounted, ref, watch} from 'vue';
   import {useRoute} from "vue-router";
 
   const route = useRoute();
   const token = ref();
-  const currentPath = ref(false);
+  const currentAuth = ref(false);
+
   watch(
       () => route.path,
       (newPath) => {
-        currentPath.value = !(newPath === '/login' ||
+        currentAuth.value = !(newPath === '/login' ||
             newPath === '/registration' || newPath === '/error/ErrorPage');
       }
   );
+
+  const logged = () => {
+    get_token()
+  }
+
+  const logout = () => {
+    get_token()
+  }
 
   const get_token = () => {
       $.ajax({
@@ -33,9 +42,11 @@
     });
   }
 
-  onMounted( () => {
+
+  onMounted( async () => {
     get_token()
   })
+
 </script>
 
 <style scoped>

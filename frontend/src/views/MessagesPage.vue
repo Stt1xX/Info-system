@@ -29,46 +29,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
-import {Stomp} from "@stomp/stompjs";
-import SockJS from "sockjs-client";
 
-const messages = ref([]);
-let stompClient = null;
+import {accept, reject, messages} from "@/js/requests-ws.js";
 
-onMounted(() => {
-  connect(get_reg_requests);
-});
-
-const get_reg_requests = (data) => {
-  messages.value = data;
-};
-
-const connect = (onMessageReceived) => {
-  stompClient = Stomp.over(() => new SockJS('http://localhost:8080/ws'));
-  stompClient.connect({}, () => {
-    get();
-    stompClient.subscribe("/topic/reg_requests", (message) => {
-      onMessageReceived(JSON.parse(message.body));
-    });
-  });
-};
-
-function get() {
-  if (stompClient && stompClient.connected) {
-    stompClient.send("/app/get_reg_requests", {}, {});
-  }
-}
-
-function accept(id) {
-  if (stompClient && stompClient.connected) {
-    stompClient.send("/app/accept", {}, id);
-  }
-}
-
-function reject(id) {
-  if (stompClient && stompClient.connected) {
-    stompClient.send("/app/reject", {}, id);
-  }
-}
 </script>

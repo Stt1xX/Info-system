@@ -9,15 +9,21 @@
 
 <script setup>
 import router from '@/routes/routes.js'
+import {onMounted} from "vue";
+import {connect} from "@/js/requests-ws.js";
 
 const props = defineProps({
   is_admin: Boolean
 })
 
+onMounted(() => {
+    connect()
+})
+
 const navigateToRequests = () => {
-  // if (props.is_admin)
+  if (props.is_admin)
     router.push("/admin/messages")
-  // else router.push("/error/ErrorPage?message=403")
+  else router.push("/error/ErrorPage?message=403")
 }
 </script>
 
