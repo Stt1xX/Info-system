@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping("/delete_user")
-    public void deleteUser(@RequestBody String username) {
-        userService.deleteUser(username);
+    public void deleteUser() {
+        userService.deleteUser();
     }
 }

@@ -71,7 +71,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(String username) {
+    public void deleteUser() {
+        String username = getCurrentUsername();
         userRepository.deleteByUsername(username);
     }
 }
