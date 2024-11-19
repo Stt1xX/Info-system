@@ -28,17 +28,4 @@ const router = createRouter({
     routes
 })
 
-    // router.beforeEach(async (to, from, next) => {
-    //     to.meta.token = await new Promise((resolve) => {
-    //         $.ajax({
-    //             type: "GET",
-    //             url: "/app/csrf-token",
-    //             success: function (response) {
-    //                 resolve(response.csrfToken)
-    //             }
-    //         })
-    //     });
-    //     next();
-    // })
-
 export default router;

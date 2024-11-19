@@ -11,10 +11,12 @@
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
     "sockjs-client": "^1.6.1",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@vitejs/plugin-vue": "^5.1.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",

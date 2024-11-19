@@ -5,26 +5,26 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v.01M12 12v.01M12 18v.01"></path>
       </svg>
     </button>
-    <DropdownMenu :visible="menuVisible" :onClose="closeMenu" :item="car" :formFor="AddEditCarWindow" :name="'car'"/>
+    <DropdownMenu :visible="menuVisible" :onClose="closeMenu" :item="obj" :formFor="AddEditCoordsWindow" :name="'coordinates'"/>
     <div class="px-6 py-4 flex items-center">
       <div class="flex-grow w-52">
-        <div class="font-bold text-xl mb-2">{{obj.name}}</div>
         <p class="text-base">
           id: {{ obj.id }}<br>
-          isCool: {{ obj.cool }}<br>
+          x: {{ obj.x }}<br>
+          x: {{ obj.y }}<br>
           author: {{obj.author}}<br>
         </p>
       </div>
-      <CarLogo class="w-[108px] h-[108px] mr-14" />
+      <CoordsLogo class="w-[108px] h-[108px] mr-14" />
     </div>
   </div>
 </template>
 
 <script setup>
 import {ref} from 'vue';
-import CarLogo from "@/components/logos/CarLogo.vue";
+import CoordsLogo from "@/components/logos/CoordsLogo.vue";
 import DropdownMenu from "@/components/DropdownMenu.vue";
-import AddEditCarWindow from '@/components/windows/AddEditCarWindow.vue';
+import AddEditCoordsWindow from "@/components/windows/AddEditCoordsWindow.vue";
 
 const props = defineProps({
   obj: Object
@@ -47,7 +47,7 @@ const closeMenu = () => {
 
 const closeAllMenus = () => {
   const event = new CustomEvent('close-all-menus');
-    window.dispatchEvent(event);
+  window.dispatchEvent(event);
 };
 
 window.addEventListener('close-all-menus', closeMenu);
