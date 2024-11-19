@@ -1,5 +1,12 @@
 <template>
-  <h1 class="text-2xl font-bold mb-6 text-center">{{ header }}</h1>
+  <h1 class="text-2xl font-bold mb-6 mt-6 text-center">{{ header }}</h1>
+  <div class="mx-auto max-w-7xl mb-6">
+    <div class="flex items-center space-x-4 justify-between">
+      <SearchInput class="w-[90%]"/>
+      <SortButton />
+      <AdditionalFuncButton />
+    </div>
+  </div>
   <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-7xl mx-auto">
     <div class="grid grid-cols-3 gap-4">
       <div class="flex justify-center items-center">
@@ -11,11 +18,14 @@
     </div>
   </div>
   <component :is="addEditWindow" :visible="isModalVisible" @close="hideModal"
-  :title="'Add new ' + name"/>
+             :title="'Add new ' + name"/>
 </template>
 
 <script setup>
 import {ref} from 'vue'
+import SearchInput from "@/components/SearchInput.vue";
+import SortButton from "@/components/buttons/SortButton.vue";
+import AdditionalFuncButton from "@/components/buttons/AdditionalFuncButton.vue";
 
 const props = defineProps({
   objs: Array,

@@ -45,6 +45,8 @@ const yError = ref('');
 const closeModal = () => {
   xCoord.value = '';
   yCoord.value = '';
+  xError.value = '';
+  yError.value = '';
   emit('close');
 };
 

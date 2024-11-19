@@ -5,11 +5,6 @@
 <template>
   <svg width="800px" height="800px" viewBox="0 -16 64 64" xmlns="http://www.w3.org/2000/svg">
 
-    <title>Car</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-
-    </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g id="Car" transform="translate(1.000000, 1.000000)" stroke="#6B6C6E" stroke-width="2">
         <path d="M55,25 L60,25 C61.1,25 62,24.1 62,23 L60,13 C60,11.9 53,11 53,11 C53,11 46.1,0 45,0 L23,0 C21,0 13,11 13,11 C13,11 2.1,13.1 1,18 L0,23 C0,24.1 0.9,25 2,25 L8,25" id="Shape">

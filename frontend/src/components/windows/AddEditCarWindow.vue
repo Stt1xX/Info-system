@@ -44,6 +44,7 @@ const carNameError = ref('');
 const closeModal = () => {
   name.value = '';
   cool.value = false;
+  carNameError.value = '';
   emit('close');
 };
 
