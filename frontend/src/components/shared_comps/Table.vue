@@ -23,7 +23,7 @@
 
 <script setup>
 import {ref} from 'vue'
-import SearchInput from "@/components/SearchInput.vue";
+import SearchInput from "@/components/shared_comps/SearchInput.vue";
 import SortButton from "@/components/buttons/SortButton.vue";
 import AdditionalFuncButton from "@/components/buttons/AdditionalFuncButton.vue";
 

@@ -23,7 +23,7 @@
 <script setup>
 import {ref} from 'vue';
 import CoordsLogo from "@/components/logos/CoordsLogo.vue";
-import DropdownMenu from "@/components/DropdownMenu.vue";
+import DropdownMenu from "@/components/shared_comps/DropdownMenu.vue";
 import AddEditCoordsWindow from "@/components/windows/AddEditCoordsWindow.vue";
 
 const props = defineProps({

@@ -7,8 +7,8 @@
 </template>
 
 <script setup>
-  import Footer from "@/components/Footer.vue";
-  import Header from "@/components/Header.vue";
+  import Footer from "@/components/shared_comps/Footer.vue";
+  import Header from "@/components/shared_comps/Header.vue";
   import { onMounted, ref, watch} from 'vue';
   import {useRoute} from "vue-router";
 

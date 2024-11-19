@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import Table from '@/components/Table.vue';
+import Table from '@/components/shared_comps/Table.vue';
 import {ref} from "vue";
 import CarItem from "@/components/items/CarItem.vue";
 import AddEditCarWindow from "@/components/windows/AddEditCarWindow.vue";

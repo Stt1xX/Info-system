@@ -23,7 +23,7 @@
 <script setup>
 import {ref} from 'vue';
 import CarLogo from "@/components/logos/CarLogo.vue";
-import DropdownMenu from "@/components/DropdownMenu.vue";
+import DropdownMenu from "@/components/shared_comps/DropdownMenu.vue";
 import AddEditCarWindow from '@/components/windows/AddEditCarWindow.vue';
 
 const props = defineProps({

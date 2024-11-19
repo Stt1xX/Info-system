@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import Table from '@/components/Table.vue';
+import Table from '@/components/shared_comps/Table.vue';
 import {ref} from "vue";
 import CoordsItem from "@/components/items/CoordsItem.vue";
 import AddEditCoordsWindow from "@/components/windows/AddEditCoordsWindow.vue";
