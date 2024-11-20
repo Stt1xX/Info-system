@@ -10,10 +10,17 @@
 <script setup>
 
 import router from "@/routes/routes.js";
+import {onMounted} from "vue";
+import {connect} from "@/js/cars-ws.js";
 
 const navigateToCarTable = () => {
   router.push("/carTable")
 }
+
+onMounted(() => {
+  connect()
+})
+
 </script>
 
 <style scoped>

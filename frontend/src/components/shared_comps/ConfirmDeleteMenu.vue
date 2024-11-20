@@ -4,7 +4,7 @@
     <div class="bg-gray-800 p-4 rounded-lg shadow-lg w-96">
       <form class="space-y-4">
         <div class="form-group">
-          Are you sure you want to delete the <span class="font-bold">{{author}}'s {{itemName}}</span> with id: <span class="font-bold">{{id}}</span>?
+          Are you sure you want to delete the <span class="font-bold">{{author}}'s {{getItemName()}}</span> with id: <span class="font-bold">{{id}}</span>?
         </div>
         <div class="flex justify-between items-center mt-4">
           <button @click="confirmFunc" type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Yes</button>
@@ -16,23 +16,49 @@
 </template>
 
 <script setup>
+import {ItemType} from "@/js/utils.js";
+
 const props = defineProps({
   isConfirmDeleteMenuVisible: Boolean,
-  itemName: String,
+  itemCode: Number,
   id: String,
   author : String
 });
 
-const emit = defineEmits(['close', 'apply']);
+const getItemName = () => {
+  switch (props.itemCode){
+    case 1:
+      return 'car';
+    case 2:
+      return 'coordinates';
+    case 3:
+      return 'human';
+    default:
+      return 'UNDEFINED';
+  }
+}
+
+const emit = defineEmits(['close']);
 
 const confirmFunc = () => {
-  emit('apply');
+  delete_obj()
   closeMenu();
 };
 
 const closeMenu = () => {
   emit('close');
 };
+
+const delete_obj = () => {
+  switch(props.itemCode){
+    case(ItemType.CAR) : {
+      $.ajax({
+        type: 'DELETE',
+        url: 'cars/delete/' + props.id,
+      }) /// NOT DONE
+    }
+  }
+}
 </script>
 
 <style scoped>

@@ -12,7 +12,7 @@
           <label for="cool" class="ml-2 text-gray-300">Cool</label>
         </div>
         <div class="form-actions flex justify-between items-center mt-4">
-          <button @click="addCar" type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
+          <button @click="saveCar" type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
           <button @click="closeModal" type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Close</button>
         </div>
       </form>
@@ -22,10 +22,12 @@
 
 <script setup>
 import { ref } from 'vue';
+import {AddEditWindowType, token} from "@/js/utils.js";
 
 const props = defineProps({
   visible: Boolean,
   title: String,
+  type: Number,
   item: {
     type : Object,
     default : {
@@ -35,7 +37,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'add']);
+const emit = defineEmits(['close']);
 
 const name = ref(props.item.name);
 const cool = ref(props.item.cool);
@@ -59,13 +61,59 @@ const validateForm = () => {
   return isValid;
 };
 
-const addCar = () => {
+const saveCar = () => {
   if (!validateForm()) {
     return;
   }
-  emit('add', {name: name.value, cool: cool.value});
+  if (props.type === AddEditWindowType.ADDING) {
+    add_car()
+  } else {
+    edit_car()
+  }
   closeModal();
 };
+
+const add_car = () => {
+  $.ajax({
+    url: '/add_car',
+    type: 'POST',
+    contentType: 'application/json',
+    headers: {
+      'X-CSRF-Token': token.value
+    },
+    data: JSON.stringify({
+      "name": name.value,
+      "cool": cool.value
+    }),
+    success: function (data) {
+      console.log(data);
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  })
+}
+
+const edit_car = () => {
+  $.ajax({
+    url: '/update_car/' + props.item.id,
+    type: 'PATCH',
+    contentType: 'application/json',
+    headers: {
+      'X-CSRF-Token': token.value
+    },
+    data: JSON.stringify({
+      "name": name.value,
+      "cool": cool.value,
+    }),
+    success: function (data) {
+      console.log(data);
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  })
+}
 </script>
 
 <style scoped>

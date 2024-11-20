@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @Controller
-public class MyController {
+public class MainController {
 
     @GetMapping({"/login", "/registration", "/admin/messages",
     "/humanTable", "/coordinateTable", "/carTable"})

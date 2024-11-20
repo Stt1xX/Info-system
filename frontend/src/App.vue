@@ -11,9 +11,9 @@
   import Header from "@/components/shared_comps/Header.vue";
   import { onMounted, ref, watch} from 'vue';
   import {useRoute} from "vue-router";
+  import {get_token, token} from "@/js/utils.js";
 
   const route = useRoute();
-  const token = ref();
   const currentAuth = ref(false);
 
   watch(
@@ -31,17 +31,6 @@
   const logout = () => {
     get_token()
   }
-
-  const get_token = () => {
-      $.ajax({
-        type: "GET",
-        url: "/app/csrf-token",
-        success: function (response) {
-          token.value =response.csrfToken
-        }
-    });
-  }
-
 
   onMounted( async () => {
     get_token()

@@ -12,7 +12,7 @@ public class SocketSecurityConfig
     protected void configureInbound(
             MessageSecurityMetadataSourceRegistry messages) {
         messages
-                .simpDestMatchers("/app/**").hasRole("ADMIN")
+                .simpDestMatchers("/app/admin/**").hasRole("ADMIN")
                 .anyMessage().authenticated();
     }
 

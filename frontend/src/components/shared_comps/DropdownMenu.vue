@@ -20,9 +20,9 @@
         Delete
       </li>
     </ul>
-    <component :is="formFor" :visible="isEditVisible" @close="closeAddEditWindow" :title="'Edit ' + name" :item="item" />
+    <component :is="formFor" :visible="isEditVisible" @close="closeAddEditWindow" :title="'Edit ' + name" :item="item" :type="AddEditWindowType.EDITING"/>
     <ConfirmDeleteMenu :is-confirm-delete-menu-visible="isDeleteConfirmVisible"
-                         :id="item.id" :item-name="name" :author="item.author"
+                         :id="item.id" :item-code="itemCode" :author="item.author"
                        @close="closeDeleteConfirmWindow" />
   </div>
 </template>
@@ -30,13 +30,14 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import ConfirmDeleteMenu from "@/components/shared_comps/ConfirmDeleteMenu.vue";
+import {AddEditWindowType} from "@/js/utils.js";
 
 const props = defineProps({
   visible: Boolean,
   onClose: Function,
   item: Object,
   formFor : Object,
-  name : String
+  itemCode : Number
 });
 
 const isEditVisible = ref(false);

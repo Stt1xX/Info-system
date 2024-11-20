@@ -8,16 +8,9 @@
 
 <script setup>
 import Table from '@/components/shared_comps/Table.vue';
-import {ref} from "vue";
 import CarItem from "@/components/items/CarItem.vue";
 import AddEditCarWindow from "@/components/windows/AddEditCarWindow.vue";
 
-const cars = ref([
-  {id: 1, name: "Car1", cool: true, author: "Bob"},
-  {id: 2, name: "Car2", cool: true, author: "Bob"},
-  {id: 3, name: "Car3", cool: true, author: "Bob"},
-  {id: 4, name: "Car4", cool: true, author: "Bob"},
-  {id: 5, name: "Car5", cool: true, author: "Bob"},
-]);
+import {cars} from "@/js/cars-ws.js";
 
 </script>

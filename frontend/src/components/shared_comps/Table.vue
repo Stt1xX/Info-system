@@ -18,7 +18,7 @@
     </div>
   </div>
   <component :is="addEditWindow" :visible="isModalVisible" @close="hideModal"
-             :title="'Add new ' + name"/>
+             :title="'Add new ' + name" :type="AddEditWindowType.ADDING"/>
 </template>
 
 <script setup>
@@ -26,6 +26,7 @@ import {ref} from 'vue'
 import SearchInput from "@/components/shared_comps/SearchInput.vue";
 import SortButton from "@/components/buttons/SortButton.vue";
 import AdditionalFuncButton from "@/components/buttons/AdditionalFuncButton.vue";
+import {AddEditWindowType} from "@/js/utils.js";
 
 const props = defineProps({
   objs: Array,

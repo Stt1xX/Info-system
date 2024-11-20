@@ -5,7 +5,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v.01M12 12v.01M12 18v.01"></path>
       </svg>
     </button>
-    <DropdownMenu :visible="menuVisible" :onClose="closeMenu" :item="obj" :formFor="AddEditCarWindow" :name="'car'"/>
+    <DropdownMenu :visible="menuVisible" :onClose="closeMenu" :item="obj" :formFor="AddEditCarWindow" :itemCode="ItemType.CAR"/>
     <div class="px-6 py-4 flex items-center">
       <div class="flex-grow w-52">
         <div class="font-bold text-xl mb-2">{{obj.name}}</div>
@@ -25,6 +25,7 @@ import {ref} from 'vue';
 import CarLogo from "@/components/logos/CarLogo.vue";
 import DropdownMenu from "@/components/shared_comps/DropdownMenu.vue";
 import AddEditCarWindow from '@/components/windows/AddEditCarWindow.vue';
+import {ItemType} from "@/js/utils.js";
 
 const props = defineProps({
   obj: Object

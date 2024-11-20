@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @Controller
@@ -22,21 +19,21 @@ public class AdminController {
         this.requestService = requestService;
     }
 
-    @MessageMapping("/get_reg_requests")
+    @MessageMapping("/admin/get_reg_requests")
     @SendTo("/topic/reg_requests")
     public List<RequestDTO> getRegRequests()
     {
         return requestService.getAllRequests();
     }
 
-    @MessageMapping("/accept")
+    @MessageMapping("/admin/accept")
     @SendTo("/topic/reg_requests")
     public List<RequestDTO> acceptRequest(@Payload Integer id){
         requestService.acceptRequestById(id);
         return requestService.getAllRequests();
     }
 
-    @MessageMapping("/reject")
+    @MessageMapping("/admin/reject")
     @SendTo("/topic/reg_requests")
     public List<RequestDTO> rejectRequest(@Payload Integer id){
         requestService.rejectRequestById(id);

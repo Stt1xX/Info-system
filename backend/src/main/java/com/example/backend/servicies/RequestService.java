@@ -6,14 +6,12 @@ import com.example.backend.entities.User;
 import com.example.backend.entities.enums.Role;
 import com.example.backend.repositories.RequestRepository;
 import com.example.backend.repositories.UserRepository;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

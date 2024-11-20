@@ -18,6 +18,17 @@ public class Car {
     @Column(name = "cool")
     private Boolean cool;
 
+    @Column(name="author", nullable = false, length = Integer.MAX_VALUE)
+    private String author;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -34,7 +45,7 @@ public class Car {
         this.name = name;
     }
 
-    public Boolean getCool() {
+    public Boolean isCool() {
         return cool;
     }
 
