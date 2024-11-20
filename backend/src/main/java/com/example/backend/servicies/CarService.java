@@ -43,9 +43,9 @@ public class CarService {
         try{
             carRepository.save(car);
             simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
-            return resp;
+            return new ResponseEntity<>(String.format("Car %s successfully added!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Incorrect car's input data", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
         }
     }
 
@@ -56,7 +56,7 @@ public class CarService {
         }
         Car car = carRepository.findById(id).orElse(null);
         if (car == null) {
-            return new ResponseEntity<>("Car not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
         }
         car.setAuthor(userService.getCurrentUsername());
         car.setCool(carDTO.isCool());
@@ -64,10 +64,20 @@ public class CarService {
         try{
             carRepository.save(car);
             simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
-            return resp;
+            return new ResponseEntity<>(String.format("Car %s successfully updated!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Incorrect car's input data", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
         }
+    }
+
+    public ResponseEntity<?> deleteCar(Integer id) {
+        Car car = carRepository.findById(id).orElse(null);
+        if (car == null) {
+            return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
+        }
+        carRepository.delete(car);
+        simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+        return new ResponseEntity<>(String.format("Car %s successfully deleted!", car.getName()), HttpStatus.OK);
     }
 
 

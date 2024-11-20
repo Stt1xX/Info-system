@@ -21,7 +21,7 @@ public class CarController {
         this.carService = carService;
     }
 
-    @PostMapping("/add_car")
+    @PostMapping("/cars/add")
     public ResponseEntity<?> addCar(@RequestBody CarDTO carDTO) {
         return carService.addCar(carDTO);
     }
@@ -32,8 +32,13 @@ public class CarController {
         return carService.getAllCars();
     }
 
-    @PatchMapping("/update_car/{id}")
+    @PatchMapping("cars/update/{id}")
     public ResponseEntity<?> updateCar(@PathVariable Integer id, @RequestBody CarDTO carDTO) {
         return carService.updateCar(id, carDTO);
+    }
+
+    @DeleteMapping("cars/delete/{id}")
+    public ResponseEntity<?> deleteCar(@PathVariable Integer id) {
+        return carService.deleteCar(id);
     }
 }

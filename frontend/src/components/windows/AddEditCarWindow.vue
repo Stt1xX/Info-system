@@ -22,8 +22,9 @@
 
 <script setup>
 import { ref } from 'vue';
-import {AddEditWindowType, token} from "@/js/utils.js";
-
+import {token} from "@/js/csrf-token.js";
+import {AddEditWindowType} from "@/js/utils.js";
+import {showAlert} from "@/js/custom-alert.js";
 const props = defineProps({
   visible: Boolean,
   title: String,
@@ -66,38 +67,17 @@ const saveCar = () => {
     return;
   }
   if (props.type === AddEditWindowType.ADDING) {
-    add_car()
+    request('/cars/add', 'POST')
   } else {
-    edit_car()
+    request('/cars/update/' + props.item.id, 'PATCH')
   }
   closeModal();
 };
 
-const add_car = () => {
+const request = (url, type) => {
   $.ajax({
-    url: '/add_car',
-    type: 'POST',
-    contentType: 'application/json',
-    headers: {
-      'X-CSRF-Token': token.value
-    },
-    data: JSON.stringify({
-      "name": name.value,
-      "cool": cool.value
-    }),
-    success: function (data) {
-      console.log(data);
-    },
-    error: function (error) {
-      console.log(error);
-    }
-  })
-}
-
-const edit_car = () => {
-  $.ajax({
-    url: '/update_car/' + props.item.id,
-    type: 'PATCH',
+    url: url,
+    type: type,
     contentType: 'application/json',
     headers: {
       'X-CSRF-Token': token.value
@@ -107,10 +87,10 @@ const edit_car = () => {
       "cool": cool.value,
     }),
     success: function (data) {
-      console.log(data);
+      showAlert(data)
     },
     error: function (error) {
-      console.log(error);
+      showAlert(error.responseText)
     }
   })
 }

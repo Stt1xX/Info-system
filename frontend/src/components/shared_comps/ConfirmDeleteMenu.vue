@@ -4,7 +4,7 @@
     <div class="bg-gray-800 p-4 rounded-lg shadow-lg w-96">
       <form class="space-y-4">
         <div class="form-group">
-          Are you sure you want to delete the <span class="font-bold">{{author}}'s {{getItemName()}}</span> with id: <span class="font-bold">{{id}}</span>?
+          Are you sure you want to delete the <span class="font-bold">{{author}}'s {{getItemName(props.itemCode)}}</span> with id: <span class="font-bold">{{id}}</span>?
         </div>
         <div class="flex justify-between items-center mt-4">
           <button @click="confirmFunc" type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Yes</button>
@@ -16,7 +16,10 @@
 </template>
 
 <script setup>
-import {ItemType} from "@/js/utils.js";
+import {getItemName, ItemType} from "@/js/utils.js";
+import {token} from "@/js/csrf-token.js";
+import {showAlert} from "@/js/custom-alert.js";
+
 
 const props = defineProps({
   isConfirmDeleteMenuVisible: Boolean,
@@ -24,19 +27,6 @@ const props = defineProps({
   id: String,
   author : String
 });
-
-const getItemName = () => {
-  switch (props.itemCode){
-    case 1:
-      return 'car';
-    case 2:
-      return 'coordinates';
-    case 3:
-      return 'human';
-    default:
-      return 'UNDEFINED';
-  }
-}
 
 const emit = defineEmits(['close']);
 
@@ -55,7 +45,16 @@ const delete_obj = () => {
       $.ajax({
         type: 'DELETE',
         url: 'cars/delete/' + props.id,
-      }) /// NOT DONE
+        headers: {
+          'X-CSRF-Token': token.value
+        },
+        success: function (data) {
+          showAlert(data)
+        },
+        error: function (error) {
+          showAlert(error.responseText)
+        }
+      })
     }
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Header @logout="logout" v-if="currentAuth" :token="token"/>
+    <CustomAlert />
     <router-view @logged="logged" :token="token"/>
     <Footer/>
   </div>
@@ -11,7 +12,8 @@
   import Header from "@/components/shared_comps/Header.vue";
   import { onMounted, ref, watch} from 'vue';
   import {useRoute} from "vue-router";
-  import {get_token, token} from "@/js/utils.js";
+  import {get_token, token} from "@/js/csrf-token.js";
+  import CustomAlert from "@/components/shared_comps/CustomAlert.vue";
 
   const route = useRoute();
   const currentAuth = ref(false);

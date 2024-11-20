@@ -3,7 +3,7 @@ import {ref} from "vue";
 import {Stomp} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-export const cars = ref([]);
+export const cars = ref([{id: "1", name : "Test", author : "Timur", cool : true}]);
 
 export let stompClient = null;
 
