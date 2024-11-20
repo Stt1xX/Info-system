@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import {getItemName, ItemType} from "@/js/utils.js";
+import {getItemName} from "@/js/utils.js";
 import {token} from "@/js/csrf-token.js";
 import {showAlert} from "@/js/custom-alert.js";
 
@@ -40,24 +40,21 @@ const closeMenu = () => {
 };
 
 const delete_obj = () => {
-  switch(props.itemCode){
-    case(ItemType.CAR) : {
-      $.ajax({
-        type: 'DELETE',
-        url: 'cars/delete/' + props.id,
-        headers: {
-          'X-CSRF-Token': token.value
-        },
-        success: function (data) {
-          showAlert(data)
-        },
-        error: function (error) {
-          showAlert(error.responseText)
-        }
-      })
+  $.ajax({
+    type: 'DELETE',
+    url: getItemName(props.itemCode) + '/delete/' + props.id,
+    headers: {
+      'X-CSRF-Token': token.value
+    },
+    success: function (data) {
+      showAlert(data)
+    },
+    error: function (error) {
+      showAlert(error.responseText)
     }
-  }
+  })
 }
+
 </script>
 
 <style scoped>

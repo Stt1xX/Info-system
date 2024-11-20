@@ -4,7 +4,6 @@ export const visible = ref(false);
 export const message = ref('');
 
 export const closeAlert = () => {
-    console.log("close");
     visible.value = false;
     message.value = '';
 };

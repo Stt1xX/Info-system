@@ -28,7 +28,7 @@ public class CoordinatesController {
     }
 
     @MessageMapping("/get_coordinates")
-    @SendTo("/topic/cars")
+    @SendTo("/topic/coordinates")
     public List<Coordinates> getAllCars(){
         return coordinatesService.getAllCoordinates();
     }

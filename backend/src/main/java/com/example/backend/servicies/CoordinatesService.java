@@ -41,7 +41,7 @@ public class CoordinatesService {
         coordinates.setY(coordinatesDTO.getY());
         try{
             coordinatesRepository.save(coordinates);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCoordinates());
+            simpMessagingTemplate.convertAndSend("/topic/coordinates", getAllCoordinates());
             return new ResponseEntity<>("Coordinates successfully added!", org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect coordinate's input data", HttpStatus.CONFLICT);
@@ -62,7 +62,7 @@ public class CoordinatesService {
         coordinates.setY(coordinatesDTO.getY());
         try{
             coordinatesRepository.save(coordinates);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCoordinates());
+            simpMessagingTemplate.convertAndSend("/topic/coordinates", getAllCoordinates());
             return new ResponseEntity<>("Coordinates successfully updated!", org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect coordinate's input data", HttpStatus.CONFLICT);
@@ -75,7 +75,7 @@ public class CoordinatesService {
             return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
         }
         coordinatesRepository.delete(coordinates);
-        simpMessagingTemplate.convertAndSend("/topic/cars", getAllCoordinates());
+        simpMessagingTemplate.convertAndSend("/topic/coordinates", getAllCoordinates());
         return new ResponseEntity<>("Coordinates successfully deleted!", HttpStatus.OK);
     }
 }

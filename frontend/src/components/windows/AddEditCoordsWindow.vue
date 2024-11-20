@@ -1,7 +1,7 @@
 <template>
   <div v-if="visible" class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
     <h1 class="text-2xl font-bold mb-6 text-center">{{ title }}</h1>
-    <div class="login-container bg-gray-800 p-4 rounded-lg shadow-lg">
+    <div class="login-container bg-gray-800 p-4 rounded-lg shadow-lg w-[360px]">
       <form class="login-form space-y-4">
         <div class="form-group">
           <input v-model="xCoord" type="text" name="xCoord" placeholder="coordinate X" class="form-control w-full p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
@@ -12,7 +12,7 @@
           <div v-if="yError" class="warning text-red-500 mt-2">{{ yError }}</div>
         </div>
         <div class="form-actions flex justify-between items-center mt-4">
-          <button @click="addCoord" type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
+          <button @click="saveCoordinates" type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
           <button @click="closeModal" type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Close</button>
         </div>
       </form>
@@ -22,10 +22,14 @@
 
 <script setup>
 import { ref } from 'vue';
+import {AddEditWindowType} from "@/js/utils.js";
+import {token} from "@/js/csrf-token.js";
+import {showAlert} from "@/js/custom-alert.js";
 
 const props = defineProps({
   visible: Boolean,
   title: String,
+  type: Number,
   item: {
     type : Object,
     default : {
@@ -69,13 +73,38 @@ const validateForm = () => {
   return isValid;
 };
 
-const addCoord = () => {
+const saveCoordinates = () => {
   if (!validateForm()) {
     return;
   }
-  emit('add', {xCoord: xCoord.value, yCoord: yCoord.value});
+  if (props.type === AddEditWindowType.ADDING) {
+    request('/coordinates/add', 'POST')
+  } else {
+    request('/coordinates/update/' + props.item.id, 'PATCH')
+  }
   closeModal();
 };
+
+const request = (url, type) => {
+  $.ajax({
+    url: url,
+    type: type,
+    contentType: 'application/json',
+    headers: {
+      'X-CSRF-Token': token.value
+    },
+    data: JSON.stringify({
+      "x": xCoord.value,
+      "y": yCoord.value,
+    }),
+    success: function (data) {
+      showAlert(data)
+    },
+    error: function (error) {
+      showAlert(error.responseText)
+    }
+  })
+}
 </script>
 
 <style scoped>
