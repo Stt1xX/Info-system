@@ -55,15 +55,15 @@ public class RequestService {
     @Transactional
     public ResponseEntity<?> addRequest(Request request) {
         if (requestRepository.findByUsername(request.getUsername()) != null ) {
-            return new ResponseEntity<>("Запрос с таким именем уже существует", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("A request with this name already exists", HttpStatus.CONFLICT);
         }
         try{
             requestRepository.save(request);
             entityManager.clear(); // clear cache
             notifyAdminsAboutNewRequest();
-            return new ResponseEntity<>("Запрос на добавление успешно создан!", HttpStatus.OK);
+            return new ResponseEntity<>("The request to add has been successfully created!", HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Некорректные данные пользователей", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Incorrect user data", HttpStatus.CONFLICT);
         }
     }
 
