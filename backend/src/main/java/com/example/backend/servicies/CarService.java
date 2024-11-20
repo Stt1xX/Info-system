@@ -3,7 +3,6 @@ package com.example.backend.servicies;
 import com.example.backend.entities.Car;
 import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.repositories.CarRepository;
-import com.example.backend.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,13 +17,15 @@ public class CarService {
 
     private final CarRepository carRepository;
     private final UserService userService;
-        private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final Checker checker;
 
     @Autowired
-    public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate) {
+    public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker) {
         this.carRepository = carRepository;
         this.userService = userService;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.checker = checker;
     }
 
     public List<Car> getAllCars(){
@@ -32,7 +33,7 @@ public class CarService {
     }
 
     public ResponseEntity<?> addCar(CarDTO carDTO) {
-        ResponseEntity<?> resp = Validator.validate(carDTO);
+        ResponseEntity<?> resp = checker.validate(carDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
@@ -50,13 +51,17 @@ public class CarService {
     }
 
     public ResponseEntity<?> updateCar(Integer id, CarDTO carDTO) {
-        ResponseEntity<?> resp = Validator.validate(carDTO);
+        ResponseEntity<?> resp = checker.validate(carDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
         Car car = carRepository.findById(id).orElse(null);
         if (car == null) {
             return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
+        }
+        resp = checker.check_rights(car);
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return resp;
         }
         car.setAuthor(userService.getCurrentUsername());
         car.setCool(carDTO.isCool());
@@ -74,6 +79,10 @@ public class CarService {
         Car car = carRepository.findById(id).orElse(null);
         if (car == null) {
             return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
+        }
+        ResponseEntity<?> resp = checker.check_rights(car);
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return resp;
         }
         carRepository.delete(car);
         simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());

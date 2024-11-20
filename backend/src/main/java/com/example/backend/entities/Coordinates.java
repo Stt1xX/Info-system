@@ -5,7 +5,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "coordinates")
-public class Coordinates {
+public class Coordinates extends ManagedEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ColumnDefault("nextval('coordinates_id_seq')")
@@ -17,17 +17,6 @@ public class Coordinates {
 
     @Column(name = "y", nullable = false)
     private Float y;
-
-    @Column(name="author", nullable = false, length = Integer.MAX_VALUE)
-    private String author;
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
 
     public Integer getId() {
         return id;

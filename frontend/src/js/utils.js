@@ -21,3 +21,16 @@ export const getItemName = (value) => {
             return 'UNDEFINED';
     }
 }
+
+export const getUrlPrefix = (value) => {
+    switch (value){
+        case ItemType.CAR:
+            return 'cars';
+        case ItemType.COORDINATES:
+            return 'coordinates';
+        case ItemType.HUMAN:
+            return 'humans';
+        default:
+            return 'UNDEFINED';
+    }
+}

@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import {getItemName} from "@/js/utils.js";
+import {getItemName, getUrlPrefix} from "@/js/utils.js";
 import {token} from "@/js/csrf-token.js";
 import {showAlert} from "@/js/custom-alert.js";
 
@@ -42,7 +42,7 @@ const closeMenu = () => {
 const delete_obj = () => {
   $.ajax({
     type: 'DELETE',
-    url: getItemName(props.itemCode) + '/delete/' + props.id,
+    url: getUrlPrefix(props.itemCode) + '/delete/' + props.id,
     headers: {
       'X-CSRF-Token': token.value
     },

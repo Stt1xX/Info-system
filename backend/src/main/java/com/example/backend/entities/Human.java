@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "humans")
-public class Human {
+public class Human extends ManagedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "humans_id_gen")
     @SequenceGenerator(name = "humans_id_gen", sequenceName = "human_human_id_seq", allocationSize = 1)
