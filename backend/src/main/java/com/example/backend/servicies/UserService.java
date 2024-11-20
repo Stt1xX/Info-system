@@ -47,19 +47,19 @@ public class UserService {
 
     public ResponseEntity<?> addUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
-            return new ResponseEntity<>("Пользователь с таким именем уже существует", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("A user with that name already exists", HttpStatus.CONFLICT);
         }
         if (requestService.getRequestByUsername(user.getUsername()) != null) {
-            return new ResponseEntity<>("Запрос с таким именем уже существует", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("A request with this name already exists", HttpStatus.CONFLICT);
         }
         try{
             if (user.getRole() == Role.ROLE_ADMIN && !userRepository.findByRole(user.getRole()).isEmpty()) {
                 return requestService.addRequest(new Request(user.getUsername(), user.getPassword()));
             }
             userRepository.save(user);
-            return new ResponseEntity<>("Пользователь успешно создан!", HttpStatus.OK);
+            return new ResponseEntity<>("The user has been successfully created!", HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Некорректные данные пользователей", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Incorrect user data", HttpStatus.CONFLICT);
         }
     }
 
