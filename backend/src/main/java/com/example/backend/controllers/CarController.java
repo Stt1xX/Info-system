@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/cars")
 public class CarController {
 
     private final CarService carService;
@@ -21,7 +22,7 @@ public class CarController {
         this.carService = carService;
     }
 
-    @PostMapping("/cars/add")
+    @PostMapping("/add")
     public ResponseEntity<?> addCar(@RequestBody CarDTO carDTO) {
         return carService.addCar(carDTO);
     }
@@ -32,12 +33,12 @@ public class CarController {
         return carService.getAllCars();
     }
 
-    @PatchMapping("cars/update/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<?> updateCar(@PathVariable Integer id, @RequestBody CarDTO carDTO) {
         return carService.updateCar(id, carDTO);
     }
 
-    @DeleteMapping("cars/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCar(@PathVariable Integer id) {
         return carService.deleteCar(id);
     }

@@ -21,7 +21,7 @@ public class Human {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "coordinates_id", nullable = false)
-    private Coordinate coordinates;
+    private Coordinates coordinates;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "creation_date", nullable = false)
@@ -70,11 +70,11 @@ public class Human {
         this.name = name;
     }
 
-    public Coordinate getCoordinates() {
+    public Coordinates getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(Coordinate coordinates) {
+    public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
     }
 

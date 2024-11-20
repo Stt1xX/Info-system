@@ -18,7 +18,7 @@ public class CarService {
 
     private final CarRepository carRepository;
     private final UserService userService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
+        private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate) {

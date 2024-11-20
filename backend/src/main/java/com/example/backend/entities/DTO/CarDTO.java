@@ -15,10 +15,6 @@ public class CarDTO {
 
     }
 
-    public static CarDTO convertToDTO(Car car) {
-        return new CarDTO(car);
-    }
-
     public String getName() {
         return name;
     }
