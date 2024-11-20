@@ -14,6 +14,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
-        response.sendRedirect("/error/ErrorPage?error_code=403");
+        response.sendRedirect("/error/ErrorPage?message=403");
     }
 }
