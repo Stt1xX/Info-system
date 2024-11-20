@@ -20,12 +20,16 @@
         Delete
       </li>
     </ul>
-    <component :is="formFor" :visible="isVisible" @close="closeAddEditWindow" :title="'Edit ' + name" :item="item" />
+    <component :is="formFor" :visible="isEditVisible" @close="closeAddEditWindow" :title="'Edit ' + name" :item="item" />
+    <ConfirmDeleteMenu :is-confirm-delete-menu-visible="isDeleteConfirmVisible"
+                         :id="item.id" :item-name="name" :author="item.author"
+                       @close="closeDeleteConfirmWindow" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import ConfirmDeleteMenu from "@/components/shared_comps/ConfirmDeleteMenu.vue";
 
 const props = defineProps({
   visible: Boolean,
@@ -35,23 +39,27 @@ const props = defineProps({
   name : String
 });
 
-const isVisible = ref(false);
-
+const isEditVisible = ref(false);
+const isDeleteConfirmVisible = ref(false);
 
 const showDetails = () => {
   // Implement show details logic
 };
 
-const deleteItem = () => {
-  // Implement delete item logic
+const editItem = () => {
+  isEditVisible.value = true;
 };
 
-const editItem = () => {
-  isVisible.value = true;
+const deleteItem = () => {
+  isDeleteConfirmVisible.value = true;
 };
 
 const closeAddEditWindow = () => {
-  isVisible.value = false;
+  isEditVisible.value = false;
+};
+
+const closeDeleteConfirmWindow = () => {
+  isDeleteConfirmVisible.value = false;
 };
 
 const handleClickOutside = (event) => {

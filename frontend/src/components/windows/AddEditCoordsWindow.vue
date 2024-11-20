@@ -29,16 +29,16 @@ const props = defineProps({
   item: {
     type : Object,
     default : {
-      xCoord: '',
-      yCoord: ''
+      x: '',
+      y: ''
     }
   }
 });
 
 const emit = defineEmits(['close', 'add']);
 
-const xCoord = ref(props.item.xCoord);
-const yCoord = ref(props.item.yCoord);
+const xCoord = ref(props.item.x);
+const yCoord = ref(props.item.y);
 const xError = ref('');
 const yError = ref('');
 
