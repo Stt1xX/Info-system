@@ -20,7 +20,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         response.setContentType("application/json; charset=UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("responseText", "Неверный логин или пароль");
+        responseBody.put("responseText", "Invalid username or password");
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
     }
 }
