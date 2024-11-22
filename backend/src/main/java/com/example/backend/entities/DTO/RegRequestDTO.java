@@ -3,22 +3,20 @@ package com.example.backend.entities.DTO;
 import com.example.backend.entities.Request;
 import com.example.backend.utils.Utils;
 
-import java.time.Instant;
-
-public class RequestDTO {
+public class RegRequestDTO {
 
     private Integer id;
     private String username;
     private String date;
 
-    public RequestDTO(Request request) {
+    public RegRequestDTO(Request request) {
         this.id = request.getId();
         this.username = request.getUsername();
         this.date = Utils.prepareDate(request.getDate());
     }
 
-    public static RequestDTO convertToDTO(Request request) {
-        return new RequestDTO(request);
+    public static RegRequestDTO convertToDTO(Request request) {
+        return new RegRequestDTO(request);
     }
 
     public Integer getId() {

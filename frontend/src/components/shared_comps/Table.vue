@@ -1,9 +1,9 @@
 <template>
-  <h1 class="text-2xl font-bold mb-6 mt-6 text-center">{{ header }}</h1>
+  <h1 class="text-2xl font-bold mb-6 mt-6 text-center">{{ getHeader(itemType) }}</h1>
   <div class="mx-auto max-w-7xl mb-6">
     <div class="flex items-center space-x-4 justify-between">
-      <SearchInput class="w-[90%]"/>
-      <SortButton />
+      <SearchInput class="w-[90%]" />
+      <SortButton :itemType="itemType"/>
       <AdditionalFuncButton />
     </div>
   </div>
@@ -23,7 +23,7 @@
     </div>
   </div>
   <component :is="addEditWindow" :visible="isModalVisible" @close="hideModal"
-             :title="'Add new ' + name" :type="AddEditWindowType.ADDING"/>
+             :title="'Add new ' + getItemName(itemType)" :type="AddEditWindowType.ADDING"/>
 </template>
 
 <script setup>
@@ -31,14 +31,14 @@ import {ref} from 'vue'
 import SearchInput from "@/components/shared_comps/SearchInput.vue";
 import SortButton from "@/components/buttons/SortButton.vue";
 import AdditionalFuncButton from "@/components/buttons/AdditionalFuncButton.vue";
-import {AddEditWindowType} from "@/js/utils.js";
+import {AddEditWindowType, getHeader, getItemName} from "@/js/utils.js";
 
 const props = defineProps({
   objs: Array,
   item: Object,
   addEditWindow: Object,
+  itemType: Number,
   header: String,
-  name: String
 })
 
 const isModalVisible = ref(false);

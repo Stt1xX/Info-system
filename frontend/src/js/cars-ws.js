@@ -3,7 +3,7 @@ import {ref} from "vue";
 import {Stomp} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-export const cars = ref([{id: "1", name : "Test", author : "Timur", cool : true}]);
+export const cars = ref([]);
 
 export let stompClient = null;
 
@@ -12,7 +12,7 @@ export const connect = () => {
     stompClient.connect({}, () => {
         get();
         stompClient.subscribe("/topic/cars", (message) => {
-            cars.value = JSON.parse(message.body);
+            cars.value = JSON.parse(message.body).content;
         });
     });
 };
@@ -27,6 +27,11 @@ export function disconnect() {
 
 function get() {
     if (stompClient && stompClient.connected) {
-        stompClient.send("/app/get_cars", {}, {});
+        stompClient.send("/app/get_cars", {}, JSON.stringify({
+            page: 0,
+            size: 1,
+            sortBy: "id",
+            order: true
+        }));
     }
 }

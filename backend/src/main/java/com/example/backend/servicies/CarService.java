@@ -5,12 +5,21 @@ import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.repositories.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class CarService {
@@ -28,8 +37,13 @@ public class CarService {
         this.checker = checker;
     }
 
-    public List<Car> getAllCars(){
-        return carRepository.findAll();
+    public PagedModel<Car> getAllCars(int page1, int size, String sortBy, boolean order) {
+        Sort sort = order ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page1, size, sort);
+        Page<Car> page = carRepository.findAll(pageable);
+        return PagedModel.of(page.getContent(),
+                new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements()));
+
     }
 
     public ResponseEntity<?> addCar(CarDTO carDTO) {
@@ -43,7 +57,7 @@ public class CarService {
         car.setName(carDTO.getName());
         try{
             carRepository.save(car);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+//            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
             return new ResponseEntity<>(String.format("Car %s successfully added!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
@@ -68,7 +82,7 @@ public class CarService {
         car.setName(carDTO.getName());
         try{
             carRepository.save(car);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+//            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
             return new ResponseEntity<>(String.format("Car %s successfully updated!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
@@ -85,7 +99,7 @@ public class CarService {
             return resp;
         }
         carRepository.delete(car);
-        simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+//        simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
         return new ResponseEntity<>(String.format("Car %s successfully deleted!", car.getName()), HttpStatus.OK);
     }
 

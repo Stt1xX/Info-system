@@ -34,3 +34,16 @@ export const getUrlPrefix = (value) => {
             return 'UNDEFINED';
     }
 }
+
+export const getHeader = (value) => {
+    switch (value){
+        case ItemType.CAR:
+            return 'Cars';
+        case ItemType.COORDINATES:
+            return 'Coordinates';
+        case ItemType.HUMAN:
+            return 'Humans';
+        default:
+            return 'UNDEFINED';
+    }
+}

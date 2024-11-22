@@ -24,9 +24,11 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.security:spring-security-messaging'
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '3.3.5'
+
 
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

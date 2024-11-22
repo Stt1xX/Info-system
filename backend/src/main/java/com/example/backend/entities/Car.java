@@ -1,5 +1,6 @@
 package com.example.backend.entities;
 
+import com.example.backend.entities.Anntotations.SortableField;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -10,9 +11,11 @@ public class Car extends ManagedEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ColumnDefault("nextval('car_id_seq')")
     @Column(name = "id", nullable = false)
+    @SortableField(name = "id")
     private Integer id;
 
     @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
+    @SortableField(name = "name")
     private String name;
 
     @Column(name = "cool")

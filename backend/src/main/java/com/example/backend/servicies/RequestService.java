@@ -1,6 +1,6 @@
 package com.example.backend.servicies;
 
-import com.example.backend.entities.DTO.RequestDTO;
+import com.example.backend.entities.DTO.RegRequestDTO;
 import com.example.backend.entities.Request;
 import com.example.backend.entities.User;
 import com.example.backend.entities.enums.Role;
@@ -67,11 +67,11 @@ public class RequestService {
         }
     }
 
-    public List<RequestDTO> getAllRequests() {
+    public List<RegRequestDTO> getAllRequests() {
         return requestRepository
                 .findAll()
                 .stream()
-                .map(RequestDTO::convertToDTO)
+                .map(RegRequestDTO::convertToDTO)
                 .collect(Collectors.toList());
     }
 

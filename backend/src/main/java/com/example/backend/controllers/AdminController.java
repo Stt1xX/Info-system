@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entities.DTO.RequestDTO;
+import com.example.backend.entities.DTO.RegRequestDTO;
 import com.example.backend.servicies.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -21,21 +21,21 @@ public class AdminController {
 
     @MessageMapping("/admin/get_reg_requests")
     @SendTo("/topic/reg_requests")
-    public List<RequestDTO> getRegRequests()
+    public List<RegRequestDTO> getRegRequests()
     {
         return requestService.getAllRequests();
     }
 
     @MessageMapping("/admin/accept")
     @SendTo("/topic/reg_requests")
-    public List<RequestDTO> acceptRequest(@Payload Integer id){
+    public List<RegRequestDTO> acceptRequest(@Payload Integer id){
         requestService.acceptRequestById(id);
         return requestService.getAllRequests();
     }
 
     @MessageMapping("/admin/reject")
     @SendTo("/topic/reg_requests")
-    public List<RequestDTO> rejectRequest(@Payload Integer id){
+    public List<RegRequestDTO> rejectRequest(@Payload Integer id){
         requestService.rejectRequestById(id);
         return requestService.getAllRequests();
     }
