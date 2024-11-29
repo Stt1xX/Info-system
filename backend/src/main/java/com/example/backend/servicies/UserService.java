@@ -29,20 +29,12 @@ public class UserService {
         this.requestService = requestService;
     }
 
-    public String getCurrentUsername() {
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
-            return userDetails.getUsername();
+            return userRepository.findByUsername(userDetails.getUsername());
         }
-        return null;
-    }
-
-    public Boolean isAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
-            return Role.ROLE_ADMIN == Role.valueOf(userDetails.getAuthorities().stream().toList().get(0).toString());
-        }
-        return false;
+        return new User();
     }
 
     public ResponseEntity<?> addUser(User user) {
@@ -65,14 +57,14 @@ public class UserService {
 
     public ResponseEntity<?> getUserInfo() {
         Map<String, Object> map = new HashMap<>();
-        map.put("username", getCurrentUsername());
-        map.put("admin_role", isAdmin());
+        map.put("username", getCurrentUser().getUsername());
+        map.put("admin_role", getCurrentUser().getRole() == Role.ROLE_ADMIN);
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
     @Transactional
     public void deleteUser() {
-        String username = getCurrentUsername();
+        String username = getCurrentUser().getUsername();
         userRepository.deleteByUsername(username);
     }
 }

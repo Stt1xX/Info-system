@@ -5,71 +5,45 @@ import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.repositories.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
-
 @Service
-public class CarService {
-
-    private final CarRepository carRepository;
-    private final UserService userService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final Checker checker;
+public class CarService extends ItemService<CarDTO, Car> {
 
     @Autowired
     public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker) {
-        this.carRepository = carRepository;
-        this.userService = userService;
-        this.simpMessagingTemplate = simpMessagingTemplate;
-        this.checker = checker;
+        super(carRepository, userService, simpMessagingTemplate, checker);
     }
 
-    public PagedModel<Car> getAllCars(int page1, int size, String sortBy, boolean order) {
-        Sort sort = order ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page1, size, sort);
-        Page<Car> page = carRepository.findAll(pageable);
-        return PagedModel.of(page.getContent(),
-                new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements()));
-
-    }
-
-    public ResponseEntity<?> addCar(CarDTO carDTO) {
+    @Override
+    public ResponseEntity<?> add(CarDTO carDTO) {
         ResponseEntity<?> resp = checker.validate(carDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
         Car car = new Car();
-        car.setAuthor(userService.getCurrentUsername());
+        car.setAuthor(userService.getCurrentUser().getUsername());
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
         try{
-            carRepository.save(car);
-//            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+            repository.save(car);
+            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
             return new ResponseEntity<>(String.format("Car %s successfully added!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
         }
     }
 
-    public ResponseEntity<?> updateCar(Integer id, CarDTO carDTO) {
+    @Override
+    public ResponseEntity<?> update(Integer id, CarDTO carDTO) {
         ResponseEntity<?> resp = checker.validate(carDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        Car car = carRepository.findById(id).orElse(null);
+        Car car = repository.findById(id).orElse(null);
         if (car == null) {
             return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
         }
@@ -77,20 +51,21 @@ public class CarService {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        car.setAuthor(userService.getCurrentUsername());
+        car.setAuthor(userService.getCurrentUser().getUsername());
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
         try{
-            carRepository.save(car);
-//            simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+            repository.save(car);
+            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
             return new ResponseEntity<>(String.format("Car %s successfully updated!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
         }
     }
 
-    public ResponseEntity<?> deleteCar(Integer id) {
-        Car car = carRepository.findById(id).orElse(null);
+    @Override
+    public ResponseEntity<?> delete(Integer id) {
+        Car car = repository.findById(id).orElse(null);
         if (car == null) {
             return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
         }
@@ -98,10 +73,8 @@ public class CarService {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        carRepository.delete(car);
-//        simpMessagingTemplate.convertAndSend("/topic/cars", getAllCars());
+        repository.delete(car);
+        simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
         return new ResponseEntity<>(String.format("Car %s successfully deleted!", car.getName()), HttpStatus.OK);
     }
-
-
 }

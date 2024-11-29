@@ -3,6 +3,7 @@ package com.example.backend.servicies;
 import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.ManagedEntity;
+import com.example.backend.entities.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,8 @@ public class Checker {
     }
 
     public ResponseEntity<?> check_rights(ManagedEntity entity){
-        String username = userService.getCurrentUsername();
-        if (!userService.isAdmin() && !entity.getAuthor().equals(username)){
+        String username = userService.getCurrentUser().getUsername();
+        if (!(userService.getCurrentUser().getRole() == Role.ROLE_ADMIN) && !entity.getAuthor().equals(username)){
             return new ResponseEntity<>("Error: You don't have rights to do this", org.springframework.http.HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>("OK!", org.springframework.http.HttpStatus.OK);

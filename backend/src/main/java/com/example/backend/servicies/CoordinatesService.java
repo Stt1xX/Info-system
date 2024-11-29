@@ -10,51 +10,40 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class CoordinatesService {
-
-    private final CoordinatesRepository coordinatesRepository;
-    private final UserService userService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final Checker checker;
+public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates> {
 
     @Autowired
     public CoordinatesService(CoordinatesRepository coordinatesRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker) {
-        this.coordinatesRepository = coordinatesRepository;
-        this.userService = userService;
-        this.simpMessagingTemplate = simpMessagingTemplate;
-        this.checker = checker;
-    }
-    public List<Coordinates> getAllCoordinates(){
-        return coordinatesRepository.findAll();
+        super(coordinatesRepository, userService, simpMessagingTemplate, checker);
     }
 
-    public ResponseEntity<?> addCoordinate(CoordinatesDTO coordinatesDTO) {
+    @Override
+    public ResponseEntity<?> add(CoordinatesDTO coordinatesDTO) {
         ResponseEntity<?> resp = checker.validate(coordinatesDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
         Coordinates coordinates = new Coordinates();
-        coordinates.setAuthor(userService.getCurrentUsername());
+        coordinates.setAuthor(userService.getCurrentUser().getUsername());
         coordinates.setX(coordinatesDTO.getX());
         coordinates.setY(coordinatesDTO.getY());
         try{
-            coordinatesRepository.save(coordinates);
-            simpMessagingTemplate.convertAndSend("/topic/coordinates", getAllCoordinates());
+            repository.save(coordinates);
+            simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
             return new ResponseEntity<>("Coordinates successfully added!", org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect coordinate's input data", HttpStatus.CONFLICT);
         }
     }
 
-    public ResponseEntity<?> updateCoordinates(Integer id, CoordinatesDTO coordinatesDTO) {
+    @Override
+    public ResponseEntity<?> update(Integer id, CoordinatesDTO coordinatesDTO) {
         ResponseEntity<?> resp = checker.validate(coordinatesDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        Coordinates coordinates = coordinatesRepository.findById(id).orElse(null);
+        Coordinates coordinates = repository.findById(id).orElse(null);
         if (coordinates == null) {
             return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
         }
@@ -62,20 +51,21 @@ public class CoordinatesService {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        coordinates.setAuthor(userService.getCurrentUsername());
+        coordinates.setAuthor(userService.getCurrentUser().getUsername());
         coordinates.setX(coordinatesDTO.getX());
         coordinates.setY(coordinatesDTO.getY());
         try{
-            coordinatesRepository.save(coordinates);
-            simpMessagingTemplate.convertAndSend("/topic/coordinates", getAllCoordinates());
+            repository.save(coordinates);
+            simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
             return new ResponseEntity<>("Coordinates successfully updated!", org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect coordinate's input data", HttpStatus.CONFLICT);
         }
     }
 
-    public ResponseEntity<?> deleteCar(Integer id) {
-        Coordinates coordinates = coordinatesRepository.findById(id).orElse(null);
+    @Override
+    public ResponseEntity<?> delete(Integer id) {
+        Coordinates coordinates = repository.findById(id).orElse(null);
         if (coordinates == null) {
             return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
         }
@@ -83,8 +73,8 @@ public class CoordinatesService {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        coordinatesRepository.delete(coordinates);
-        simpMessagingTemplate.convertAndSend("/topic/coordinates", getAllCoordinates());
+        repository.delete(coordinates);
+        simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
         return new ResponseEntity<>("Coordinates successfully deleted!", HttpStatus.OK);
     }
 }
