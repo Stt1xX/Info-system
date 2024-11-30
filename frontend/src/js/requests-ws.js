@@ -9,21 +9,14 @@ export let stompClient = null;
 
 export const connect = () => {
     stompClient = Stomp.over(() => new SockJS('/ws'));
-    stompClient.connect({}, () => {
+    stompClient.debug = function() {}
+    stompClient.connect({}, ()   => {
         get();
         stompClient.subscribe("/topic/reg_requests", (message) => {
             messages.value = JSON.parse(message.body);
         });
     });
 };
-
-export function disconnect() {
-    if (stompClient) {
-        stompClient.disconnect(() => {
-            stompClient = null;
-        });
-    }
-}
 
 function get() {
     if (stompClient && stompClient.connected) {

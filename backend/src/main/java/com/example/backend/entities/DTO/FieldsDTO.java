@@ -1,11 +1,11 @@
 package com.example.backend.entities.DTO;
 
-public class SortableFieldDTO {
+public class FieldsDTO {
 
     private String frontName;
     private String backName;
 
-    public SortableFieldDTO(String frontName, String backName) {
+    public FieldsDTO(String frontName, String backName) {
         this.frontName = frontName;
         this.backName = backName;
     }

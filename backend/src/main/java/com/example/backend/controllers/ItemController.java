@@ -1,7 +1,9 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entities.Anntotations.SearchableField;
+import com.example.backend.entities.Anntotations.SortableField;
 import com.example.backend.entities.DTO.PageRequestDTO;
-import com.example.backend.entities.DTO.SortableFieldDTO;
+import com.example.backend.entities.DTO.FieldsDTO;
 import com.example.backend.servicies.ItemService;
 import com.example.backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +45,12 @@ public abstract class ItemController<ClassDTO, MainClass> {
     }
 
     @GetMapping("/get_sortable_fields")
-    public List<SortableFieldDTO> getSortableFields() {
-        return Utils.getSortableFields(mainClass);
+    public List<FieldsDTO> getSortableFields() {
+        return Utils.getFields(mainClass, SortableField.class);
+    }
+
+    @GetMapping("/get_searchable_fields")
+    public List<FieldsDTO> getSearchableFields() {
+        return Utils.getFields(mainClass, SearchableField.class);
     }
 }

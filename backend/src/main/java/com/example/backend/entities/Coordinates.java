@@ -1,5 +1,6 @@
 package com.example.backend.entities;
 
+import com.example.backend.entities.Anntotations.SearchableField;
 import com.example.backend.entities.Anntotations.SortableField;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,6 +13,7 @@ public class Coordinates extends ManagedEntity{
     @ColumnDefault("nextval('coordinates_id_seq')")
     @Column(name = "id", nullable = false)
     @SortableField(name = "id")
+    @SearchableField(name = "id")
     private Integer id;
 
     @Column(name = "x")

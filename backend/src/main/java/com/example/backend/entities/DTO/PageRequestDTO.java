@@ -5,12 +5,32 @@ public class PageRequestDTO {
     private int size;
     private String sortBy;
     private boolean order;
+    private String template;
+    private String varName;
 
-    public PageRequestDTO(int page, int size, String sortBy, boolean order) {
+    public PageRequestDTO(int page, int size, String sortBy, boolean order, String template, String varName) {
         this.page = page;
         this.size = size;
         this.sortBy = sortBy;
         this.order = order;
+        this.template = template;
+        this.varName = varName;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
+    public String getVarName() {
+        return varName;
+    }
+
+    public void setVarName(String varName) {
+        this.varName = varName;
     }
 
     public int getPage() {

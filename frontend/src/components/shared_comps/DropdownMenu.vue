@@ -85,6 +85,6 @@ onUnmounted(() => {
 }
 
 li {
-  line-height: 1.25; /* Reduce the spacing between lines */
+  line-height: 1.25;
 }
 </style>

@@ -4,7 +4,7 @@
   <h1 class="text-2xl font-bold mb-6 mt-6 text-center">{{ getHeader(props.itemType) }}</h1>
   <div class="mx-auto max-w-7xl mb-6">
     <div class="flex items-center space-x-4 justify-between">
-      <SearchInput class="w-[90%]" />
+      <SearchInput class="w-[90%]" :itemType="itemType" />
       <SortButton :itemType="itemType"/>
       <AdditionalFuncButton />
     </div>

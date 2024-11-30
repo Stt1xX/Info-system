@@ -1,10 +1,11 @@
 package com.example.backend.utils;
 
-import com.example.backend.entities.Anntotations.SortableField;
-import com.example.backend.entities.DTO.SortableFieldDTO;
+import com.example.backend.entities.DTO.FieldsDTO;
 import com.example.backend.entities.ManagedEntity;
-
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -23,16 +24,20 @@ public class Utils {
         return formatter.format(instant);
     }
 
-    public static List<SortableFieldDTO> getSortableFields(Class<?> clazz) {
-        List<SortableFieldDTO> sortableFields = new ArrayList<>();
+    public static List<FieldsDTO> getFields(Class<?> clazz, Class<? extends Annotation> annotation) {
+        List<FieldsDTO> sortableFields = new ArrayList<>();
         Field[] fields = Stream.concat(Arrays.stream(clazz.getDeclaredFields()), Arrays.stream(ManagedEntity.class.getDeclaredFields()))
                 .toArray(Field[]::new);
         for (Field field : fields) {
-            if (field.isAnnotationPresent(SortableField.class)) {
-                sortableFields.add(new SortableFieldDTO(
-                        field.getAnnotation(SortableField.class).name(),
-                        field.getName())
-                );
+            if (field.isAnnotationPresent(annotation)) {
+                try {
+                    Annotation ann = field.getAnnotation(annotation);
+                    Method method = ann.annotationType().getMethod("name");
+                    sortableFields.add(new FieldsDTO(
+                            (String) method.invoke(ann),
+                            field.getName())
+                    );
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored){}
             }
         }
         return sortableFields;
