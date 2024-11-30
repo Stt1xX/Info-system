@@ -1,6 +1,7 @@
 package com.example.backend.utils;
 
 import com.example.backend.entities.Anntotations.SortableField;
+import com.example.backend.entities.DTO.SortableFieldDTO;
 import com.example.backend.entities.ManagedEntity;
 
 import java.lang.reflect.Field;
@@ -22,13 +23,16 @@ public class Utils {
         return formatter.format(instant);
     }
 
-    public static List<String> getSortableFields(Class<?> clazz) {
-        List<String> sortableFields = new ArrayList<>();
+    public static List<SortableFieldDTO> getSortableFields(Class<?> clazz) {
+        List<SortableFieldDTO> sortableFields = new ArrayList<>();
         Field[] fields = Stream.concat(Arrays.stream(clazz.getDeclaredFields()), Arrays.stream(ManagedEntity.class.getDeclaredFields()))
                 .toArray(Field[]::new);
         for (Field field : fields) {
             if (field.isAnnotationPresent(SortableField.class)) {
-                sortableFields.add(field.getAnnotation(SortableField.class).name());
+                sortableFields.add(new SortableFieldDTO(
+                        field.getAnnotation(SortableField.class).name(),
+                        field.getName())
+                );
             }
         }
         return sortableFields;

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-sm rounded shadow-lg bg-gray-700 relative">
+  <div class="w-full rounded shadow-lg bg-gray-700 relative">
     <button @click="toggleMenu" @click.stop class="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-600">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v.01M12 12v.01M12 18v.01"></path>

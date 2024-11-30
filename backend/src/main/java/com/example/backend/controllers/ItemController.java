@@ -1,6 +1,7 @@
 package com.example.backend.controllers;
 
 import com.example.backend.entities.DTO.PageRequestDTO;
+import com.example.backend.entities.DTO.SortableFieldDTO;
 import com.example.backend.servicies.ItemService;
 import com.example.backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public abstract class ItemController<ClassDTO, MainClass> {
     }
 
     @GetMapping("/get_sortable_fields")
-    public List<String> getSortableFields() {
+    public List<SortableFieldDTO> getSortableFields() {
         return Utils.getSortableFields(mainClass);
     }
 }

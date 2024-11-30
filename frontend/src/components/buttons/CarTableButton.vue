@@ -11,14 +11,15 @@
 
 import router from "@/routes/routes.js";
 import {onMounted} from "vue";
-import {connect} from "@/js/cars-ws.js";
+import {connect} from "@/js/items-ws.js";
+import {ItemType} from "@/js/utils.js";
 
 const navigateToCarTable = () => {
   router.push("/carTable")
 }
 
 onMounted(() => {
-  connect()
+  connect(ItemType.CAR)
 })
 
 </script>

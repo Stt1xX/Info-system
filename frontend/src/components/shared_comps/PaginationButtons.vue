@@ -1,29 +1,33 @@
 <template>
   <div class="flex justify-center mt-4">
-    <button @click="prevPage" :disabled="page_number === 0" class="px-4 py-2 mx-1 bg-gray-700 text-white rounded disabled:opacity-50">
+    <button @click="prevPage" :disabled="objects[itemType].page_number === 0" class="px-4 py-2 mx-1 bg-gray-700 text-white rounded disabled:opacity-50">
       Previous
     </button>
-    <span class="px-4 py-2 mx-1">{{ page_number + 1}}</span>
-    <button @click="nextPage" :disabled="total_pages - page_number <= 1" class="px-4 py-2 mx-1 bg-gray-700 text-white rounded disabled:opacity-50">
+    <span class="px-4 py-2 mx-1">{{ objects[itemType].page_number + 1}}</span>
+    <button @click="nextPage" :disabled="objects[itemType].total_pages - objects[itemType].page_number <= 1" class="px-4 py-2 mx-1 bg-gray-700 text-white rounded disabled:opacity-50">
       Next
     </button>
   </div>
 </template>
 
 <script setup>
-import {get, page_number, total_pages} from "@/js/cars-ws.js";
+import {get, objects} from "@/js/items-ws.js";
 
+
+const props = defineProps({
+  itemType : Number
+})
 
 const prevPage = () => {
-  if (page_number.value > 0) {
-    page_number.value -= 1;
-    get();
+  if (objects.value[props.itemType].page_number > 0) {
+    objects.value[props.itemType].page_number -= 1;
+    get(props.itemType);
   }
 };
 
 const nextPage = () => {
-    page_number.value += 1;
-    get();
+  objects.value[props.itemType].page_number += 1;
+    get(props.itemType);
 };
 </script>
 

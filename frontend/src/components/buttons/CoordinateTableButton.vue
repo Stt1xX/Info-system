@@ -10,14 +10,15 @@
 <script setup>
 import router from "@/routes/routes.js";
 import {onMounted} from "vue";
-import {connect} from "@/js/coordinates-ws.js";
+import {connect} from "@/js/items-ws.js";
+import {ItemType} from "@/js/utils.js";
 
 const navigateToCoordinateTable = () => {
   router.push("/coordinateTable")
 }
 
 onMounted(() => {
-  connect()
+  connect(ItemType.COORDINATES)
 })
 
 </script>
