@@ -2,11 +2,13 @@ package com.example.backend.entities;
 
 import com.example.backend.entities.Anntotations.SearchableField;
 import com.example.backend.entities.Anntotations.SortableField;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "coordinates")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Coordinates extends ManagedEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

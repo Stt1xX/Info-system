@@ -2,6 +2,7 @@ package com.example.backend.entities;
 
 import com.example.backend.entities.enums.Mood;
 import com.example.backend.entities.enums.WeaponType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -11,8 +12,8 @@ import java.time.Instant;
 @Table(name = "humans")
 public class Human extends ManagedEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "humans_id_gen")
-    @SequenceGenerator(name = "humans_id_gen", sequenceName = "human_human_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ColumnDefault("nextval('humans_id_seq')")
     @Column(name = "human_id", nullable = false)
     private Integer id;
 
@@ -34,7 +35,7 @@ public class Human extends ManagedEntity {
     private Boolean hasToothpick;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "car_id")
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
     @Enumerated(EnumType.STRING)
@@ -53,6 +54,21 @@ public class Human extends ManagedEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "weapon_type", nullable = false)
     private WeaponType weaponType;
+
+    public Human(String name, WeaponType weaponType, Long minutesOfWaiting, Integer impactSpeed, String soundtrackName, Mood mood, Boolean hasToothpick, Boolean realHero) {
+        this.name = name;
+        this.weaponType = weaponType;
+        this.minutesOfWaiting = minutesOfWaiting.intValue();
+        this.impactSpeed = impactSpeed;
+        this.soundtrackName = soundtrackName;
+        this.mood = mood;
+        this.hasToothpick = hasToothpick;
+        this.realHero = realHero;
+    }
+
+    public Human() {
+
+    }
 
     public Integer getId() {
         return id;
