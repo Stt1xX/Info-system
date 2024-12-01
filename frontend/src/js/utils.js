@@ -9,6 +9,13 @@ export const ItemType = {
     HUMAN : 3
 }
 
+export const AddHumanPageNumber = {
+    SET_CAR : 1,
+    SET_COORDINATES : 2,
+    SET_HUMAN : 3,
+    PREVIEW : 4
+}
+
 export const getItemName = (value) => {
     switch (value){
         case ItemType.CAR:

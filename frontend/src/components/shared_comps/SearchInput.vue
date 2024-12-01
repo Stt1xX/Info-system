@@ -43,7 +43,7 @@ const selectOption = (option) => {
 };
 
 const handleClickOutside = (event) => {
-  if (dropdown.value && !dropdown.value.contains(event.target)) {
+      if (dropdown.value && !dropdown.value.contains(event.target)) {
     isDropdownOpen.value = false;
   }
 };
