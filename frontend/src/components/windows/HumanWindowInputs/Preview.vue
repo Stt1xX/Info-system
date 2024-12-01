@@ -50,7 +50,32 @@
 </template>
 
 <script setup>
+import {token} from "@/js/csrf-token.js";
+import {showAlert} from "@/js/custom-alert.js";
+
 const props = defineProps({
   data: Object
 });
+
+const request = (url, type) => {
+  $.ajax({
+    url: url,
+    type: type,
+    contentType: 'application/json',
+    headers: {
+      'X-CSRF-Token': token.value
+    },
+    data: JSON.stringify({
+      "x": xCoord.value,
+      "y": yCoord.value,
+    }),
+    success: function (data) {
+      showAlert(data)
+    },
+    error: function (error) {
+      showAlert(error.responseText)
+    }
+  })
+}
+
 </script>

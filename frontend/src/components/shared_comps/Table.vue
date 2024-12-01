@@ -1,6 +1,6 @@
 <template>
   <component :is="addEditWindow" :visible="isModalVisible" @close="hideModal"
-             :title="'Add new ' + getItemName(itemType)" :type="AddEditWindowType.ADDING" class="fixed inset-0 z-50"/>
+             :title="'Add new ' + getItemName(itemType)" :type="AddEditWindowType.ADDING" class="fixed inset-0 z-40"/>
   <h1 class="text-2xl font-bold mb-6 mt-6 text-center">{{ getHeader(props.itemType) }}</h1>
   <div class="mx-auto max-w-7xl mb-6">
     <div class="flex items-center space-x-4 justify-between">

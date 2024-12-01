@@ -54,8 +54,8 @@ const applySort = () => {
 };
 
 const closeMenu = () => {
-  selectedOption.value = objects.value[props.itemType].value
-  selectedDirection.value = objects.value[props.itemType].value
+  selectedOption.value = objects.value[props.itemType].sortBy
+  selectedDirection.value = objects.value[props.itemType].order
   emit('close');
 };
 

@@ -6,7 +6,9 @@ export const AddEditWindowType = {
 export const ItemType = {
     CAR : 1,
     COORDINATES : 2,
-    HUMAN : 3
+    HUMAN : 3,
+    CAR_HUMAN_SEARCH : 4,
+    COORDINATES_HUMAN_SEARCH : 5
 }
 
 export const AddHumanPageNumber = {
@@ -31,8 +33,10 @@ export const getItemName = (value) => {
 
 export const getUrlPrefix = (value) => {
     switch (value){
+        case ItemType.CAR_HUMAN_SEARCH:
         case ItemType.CAR:
             return 'cars';
+        case ItemType.COORDINATES_HUMAN_SEARCH:
         case ItemType.COORDINATES:
             return 'coordinates';
         case ItemType.HUMAN:

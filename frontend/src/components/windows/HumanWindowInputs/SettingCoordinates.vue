@@ -1,77 +1,49 @@
 <template>
   <div class="form-group flex flex-col items-center">
     <label class="text-white mb-2 text-lg text-center block">Choose coordinates for your man:</label>
-    <div class="relative w-1/2" ref="dropdown">
-      <div @click="toggleDropdown" class="bg-gray-700 border border-gray-600 rounded p-2 flex justify-between items-center cursor-pointer">
-        <span>{{ selectedCoordinatesName }}</span>
-        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
-      <div v-if="dropdownVisible" class="absolute mt-1 w-full bg-gray-700 border border-gray-600 rounded shadow-lg z-10">
-        <div v-for="coord in coordinates" :key="coord.id" @click="selectCoordinates(coord)" class="p-2 hover:bg-gray-600 cursor-pointer">
-          {{ 'x: ' + coord.x + ' y: ' + coord.y }}
+    <InnerSearch @choose="selectCoordinates" :add-edit-window="AddEditCoordsWindow" :item-type="ItemType.COORDINATES_HUMAN_SEARCH"/>
+    <div v-if="Error" class="text-red-500 mt-2">{{ Error }}</div>
+    <div class="grid grid-cols-2 mt-14 w-full gap-4" v-if="selectedCoordinates">
+      <div class="flex flex-col space-y-2">
+        <div class="flex justify-between items-center border-b border-gray-600 py-2">
+          <h3 class="text-lg font-semibold text-white">Id</h3>
+          <p class="text-white">{{ selectedCoordinates.id }}</p>
         </div>
-        <div @click="addNewCoordinates" class="p-2 hover:bg-gray-600 cursor-pointer">Add new coordinates</div>
+        <div class="flex justify-between items-center border-b border-gray-600 py-2">
+          <h3 class="text-lg font-semibold text-white">X coordinate</h3>
+          <p class="text-white">{{ selectedCoordinates.x }}</p>
+        </div>
+      </div>
+      <div class="flex flex-col space-y-2">
+        <div class="flex justify-between items-center border-b border-gray-600 py-2">
+          <h3 class="text-lg font-semibold text-white">Author</h3>
+          <p class="text-white">{{ selectedCoordinates.author }}</p>
+        </div>
+        <div class="flex justify-between items-center border-b border-gray-600 py-2">
+          <h3 class="text-lg font-semibold text-white">Y coordinate</h3>
+          <p class="text-white">{{ selectedCoordinates.y }}</p>
+        </div>
       </div>
     </div>
-    <div v-if="Error" class="text-red-500 mt-2">{{ Error }}</div>
-    <AddEditCoordsWindow  :visible="showAddEditCoordinatesWindow" @close="closeAddEditCoordinatesWindow"
-                          :title="'Add new car'" :type="AddEditWindowType.ADDING" class="fixed inset-0 z-50"/>
   </div>
 </template>
 
 <script setup>
-
-import {computed, onMounted, ref} from "vue";
+import {ref} from "vue";
+import InnerSearch from "@/components/windows/HumanWindowInputs/InnerSearch.vue";
+import {ItemType} from "@/js/utils.js";
 import AddEditCoordsWindow from "@/components/windows/AddEditCoordsWindow.vue";
-import {AddEditWindowType} from "@/js/utils.js";
 
-const coordinates = ref([{id: 1, x: 123, y: 154}, {id: 2, x: 13121223, y: 151234}]); // Example coordinates data
 const selectedCoordinates = ref(null);
 const Error = ref('');
-const showAddEditCoordinatesWindow = ref(false);
 const dropdownVisible = ref(false);
-const dropdown = ref(null);
-
-const toggleDropdown = () => {
-  dropdownVisible.value = !dropdownVisible.value;
-};
-
-const selectedCoordinatesName = computed(() => {
-  if (selectedCoordinates.value) {
-    let coord = coordinates.value.find(coordinate => coordinate.id === selectedCoordinates.value.id)
-    return 'x: ' + coord.x + ' y: ' + coord.y;
-  }
-  return 'Select coordinates';
-});
-
-const addNewCoordinates = () => {
-  showAddEditCoordinatesWindow.value = true;
-  dropdownVisible.value = false;
-};
-
-const closeAddEditCoordinatesWindow = () => {
-  showAddEditCoordinatesWindow.value = false;
-};
 
 const selectCoordinates = (coordinates) => {
   selectedCoordinates.value = coordinates;
   dropdownVisible.value = false;
 };
 
-const handleClickOutside = (event) => {
-  if (dropdown.value && !dropdown.value.contains(event.target)) {
-    dropdownVisible.value = false;
-  }
-};
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-
 const validate = () => {
-
   if (!selectedCoordinates.value) {
     Error.value = "Coordinates can't be null";
     return false;

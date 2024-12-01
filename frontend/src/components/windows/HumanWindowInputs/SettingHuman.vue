@@ -50,7 +50,6 @@
 import { ref } from 'vue';
 import CustomDropdown from '@/components/windows/HumanWindowInputs/CustomDropdown.vue';
 
-
 const formData = ref({});
 const errors = ref({
   name: '',
@@ -81,6 +80,12 @@ const validate = () => {
   if (!formData.value.impactSpeed) {
     errors.value.impactSpeed = "Impact Speed can't be empty";
     isValid = false;
+  } else if (isNaN(formData.value.impactSpeed)) {
+    errors.value.impactSpeed = "Impact Speed must be a number";
+    isValid = false;
+  } else if (formData.value.impactSpeed > 768) {
+    errors.value.impactSpeed = "Impact Speed must be less than 769";
+    isValid = false;
   } else {
     errors.value.impactSpeed = '';
   }
@@ -92,6 +97,9 @@ const validate = () => {
   }
   if (!formData.value.minutesOfWaiting) {
     errors.value.minutesOfWaiting = "Minutes of Waiting can't be empty";
+    isValid = false;
+  } else if (isNaN(formData.value.minutesOfWaiting)) {
+    errors.value.minutesOfWaiting = "Minutes of Waiting must be a number";
     isValid = false;
   } else {
     errors.value.minutesOfWaiting = '';

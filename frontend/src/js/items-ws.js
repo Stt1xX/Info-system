@@ -1,14 +1,14 @@
 import {ref} from "vue";
 
 import {Stomp} from "@stomp/stompjs";
-// import SockJS from "sockjs-client";
+import SockJS from "sockjs-client";
 import {getUrlPrefix, ItemType} from "@/js/utils.js";
 
-const defObj = () => ({
+const defObj = (page_size) => ({
     data: [],
     total_pages: 0,
     page_number: 0,
-    size_number: 8,
+    size_number: page_size,
     sortBy: 'id',
     order: true,
     searchBy: 'id',
@@ -16,9 +16,11 @@ const defObj = () => ({
 });
 
 export const objects = ref({
-    [ItemType.CAR] : defObj(),
-    [ItemType.COORDINATES] : defObj(),
-    [ItemType.HUMAN] : defObj()
+    [ItemType.CAR] : defObj(8),
+    [ItemType.COORDINATES] : defObj(8),
+    [ItemType.HUMAN] : defObj(8),
+    [ItemType.CAR_HUMAN_SEARCH] : defObj(5),
+    [ItemType.COORDINATES_HUMAN_SEARCH] : defObj(5),
 });
 
 let stompClient= new Array(3); // HUMANS, CARS, COORDINATES
@@ -27,8 +29,20 @@ export const connect = (itemType) => {
     stompClient[itemType] = Stomp.over(() => new SockJS('/ws'));
     stompClient[itemType].debug = function() {}
     stompClient[itemType].connect({}, () => {
+        if (itemType === ItemType.CAR) {
+            get(ItemType.CAR_HUMAN_SEARCH);
+        }
+        if (itemType === ItemType.COORDINATES) {
+            get(ItemType.COORDINATES_HUMAN_SEARCH);
+        }
         get(itemType);
         stompClient[itemType].subscribe(`/topic/${getUrlPrefix(itemType)}`, () => {
+            if (itemType === ItemType.CAR) {
+                get(ItemType.CAR_HUMAN_SEARCH);
+            }
+            if (itemType === ItemType.COORDINATES) {
+                get(ItemType.COORDINATES_HUMAN_SEARCH);
+            }
             get(itemType);
         });
     });
