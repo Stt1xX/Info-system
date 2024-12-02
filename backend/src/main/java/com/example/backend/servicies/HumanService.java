@@ -52,17 +52,58 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
             return new ResponseEntity<>(String.format("Human %s successfully added!", human.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>("Error: Incorrect human's input data", HttpStatus.CONFLICT);
         }
     }
 
     @Override
     public ResponseEntity<?> update(Integer id, HumanDTO humanDTO) {
-        return null;
+        ResponseEntity<?> resp = checker.validate(humanDTO);
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return resp;
+        }
+        Human human = repository.findById(id).orElse(null);
+        if (human == null) {
+            return new ResponseEntity<>("Error: Human not found", HttpStatus.NOT_FOUND);
+        }
+        resp = checker.check_rights(human);
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return resp;
+        }
+        try {
+            HumanDTO.setHuman(human, humanDTO);
+            Optional<Car> carOptional = carRepository.findById(humanDTO.getCarId());
+            Optional<Coordinates> coordinatesOptional = coordinatesRepository.findById(humanDTO.getCoordinatesId());
+            if (carOptional.isEmpty()) {
+                return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
+            }
+            if (coordinatesOptional.isEmpty()) {
+                return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
+            }
+            human.setCar(carOptional.get());
+            human.setCoordinates(coordinatesOptional.get());
+            repository.save(human);
+            simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+            return new ResponseEntity<>(String.format("Human %s successfully updated!", human.getName()), org.springframework.http.HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>("Error: Incorrect human's input data", HttpStatus.CONFLICT);
+        }
     }
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null;
+        Human human = repository.findById(id).orElse(null);
+        if (human == null) {
+            return new ResponseEntity<>("Error: Human not found", HttpStatus.NOT_FOUND);
+        }
+        ResponseEntity<?> resp = checker.check_rights(human);
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return resp;
+        }
+        repository.delete(human);
+        simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+        return new ResponseEntity<>(String.format("Human %s successfully deleted!", human.getName()), HttpStatus.OK);
     }
 }

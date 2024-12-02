@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="dropdown-menu absolute top-10 right-2 bg-gray-800 text-white rounded shadow-lg">
+  <div class="dropdown-menu absolute top-10 right-2 bg-gray-800 text-white rounded shadow-lg">
     <ul>
       <li @click="showDetails" class="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
@@ -20,52 +20,31 @@
         Delete
       </li>
     </ul>
-    <component :is="formFor" :visible="isEditVisible" @close="closeAddEditWindow" :title="'Edit ' + getItemName(props.itemCode)" :item="item" :type="AddEditWindowType.EDITING"/>
-    <ConfirmDeleteMenu :is-confirm-delete-menu-visible="isDeleteConfirmVisible"
-                         :id="item.id" :item-code="itemCode" :author="item.author"
-                       @close="closeDeleteConfirmWindow" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import ConfirmDeleteMenu from "@/components/shared_comps/ConfirmDeleteMenu.vue";
-import {AddEditWindowType, getItemName} from "@/js/utils.js";
+import { onMounted, onUnmounted } from 'vue';
 
-const props = defineProps({
-  visible: Boolean,
-  onClose: Function,
-  item: Object,
-  formFor : Object,
-  itemCode : Number
-});
-
-const isEditVisible = ref(false);
-const isDeleteConfirmVisible = ref(false);
+const emit = defineEmits(['edit', 'delete', 'close']);
 
 const showDetails = () => {
   // Implement show details logic
 };
 
 const editItem = () => {
-  isEditVisible.value = true;
+  emit('edit');
 };
 
 const deleteItem = () => {
-  isDeleteConfirmVisible.value = true;
+  emit('delete');
 };
 
-const closeAddEditWindow = () => {
-  isEditVisible.value = false;
-};
 
-const closeDeleteConfirmWindow = () => {
-  isDeleteConfirmVisible.value = false;
-};
 
 const handleClickOutside = (event) => {
   if (!event.target.closest('.dropdown-menu')) {
-    props.onClose();
+    emit('close')
   }
 };
 
@@ -81,7 +60,7 @@ onUnmounted(() => {
 <style scoped>
 .dropdown-menu {
   transition: background-color 0.3s;
-  z-index: 50;
+  z-index: 20;
 }
 
 li {

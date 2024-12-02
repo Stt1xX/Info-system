@@ -1,6 +1,7 @@
 <template>
-  <component :is="addEditWindow" :visible="isModalVisible" @close="hideModal"
+  <component :is="addEditWindow" v-if="isModalVisible" @close="hideModal"
              :title="'Add new ' + getItemName(itemType)" :type="AddEditWindowType.ADDING" class="fixed inset-0 z-40"/>
+
   <h1 class="text-2xl font-bold mb-6 mt-6 text-center">{{ getHeader(props.itemType) }}</h1>
   <div class="mx-auto max-w-7xl mb-6">
     <div class="flex items-center space-x-4 justify-between">
@@ -33,6 +34,7 @@ import SearchInput from "@/components/shared_comps/SearchInput.vue";
 import SortButton from "@/components/buttons/SortButton.vue";
 import AdditionalFuncButton from "@/components/buttons/AdditionalFuncButton.vue";
 import PaginationButtons from "@/components/shared_comps/PaginationButtons.vue";
+
 import {AddEditWindowType, getHeader, getItemName} from "@/js/utils.js";
 import {objects} from "@/js/items-ws.js";
 

@@ -29,7 +29,7 @@ const toggleDropdown = () => {
 
 const selectOption = (option) => {
   selectedOption.value = option;
-  isDropdownOpen.value = false;
+  // isDropdownOpen.value = false;
 };
 
 const handleClickOutside = (event) => {

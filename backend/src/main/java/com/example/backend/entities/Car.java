@@ -50,4 +50,12 @@ public class Car extends ManagedEntity {
         this.cool = cool;
     }
 
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", cool=" + cool +
+                '}';
+    }
 }

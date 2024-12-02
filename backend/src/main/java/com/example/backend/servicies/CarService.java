@@ -51,7 +51,6 @@ public class CarService extends ItemService<CarDTO, Car> {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        car.setAuthor(userService.getCurrentUser().getUsername());
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
         try{

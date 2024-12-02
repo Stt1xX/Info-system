@@ -5,7 +5,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v.01M12 12v.01M12 18v.01"></path>
       </svg>
     </button>
-    <DropdownMenu :visible="menuVisible" :onClose="closeMenu" :item="obj" :formFor="AddEditCoordsWindow" :itemCode="ItemType.COORDINATES"/>
+    <DropdownMenu v-if="isMenuVisible" @edit="openEditWindow" @delete="openDeleteConfirm" @close="closeMenu" />
     <div class="px-6 py-4 flex items-center">
       <div class="flex-grow w-52">
         <p class="text-base">
@@ -18,6 +18,10 @@
       <CoordsLogo class="w-[108px] h-[108px] mr-14" />
     </div>
   </div>
+  <AddEditCoordsWindow v-if="isEditVisible" @close="closeEditWindow" :title="'Edit ' + getItemName(ItemType.COORDINATES)" :item="obj" :type="AddEditWindowType.EDITING" class="fixed inset-0 z-40"/>
+  <ConfirmDeleteMenu v-if="isDeleteConfirmVisible"
+                     :id="obj.id" :item-code="ItemType.COORDINATES" :author="obj.author"
+                     @close="closeDeleteConfirmWindow" />
 </template>
 
 <script setup>
@@ -25,33 +29,46 @@ import {ref} from 'vue';
 import CoordsLogo from "@/components/logos/CoordsLogo.vue";
 import DropdownMenu from "@/components/shared_comps/DropdownMenu.vue";
 import AddEditCoordsWindow from "@/components/windows/AddEditCoordsWindow.vue";
-import {ItemType} from "@/js/utils.js";
+import {AddEditWindowType, getItemName, ItemType} from "@/js/utils.js";
+import ConfirmDeleteMenu from "@/components/shared_comps/ConfirmDeleteMenu.vue";
 
 const props = defineProps({
   obj: Object
 });
 
-const menuVisible = ref(false);
+const isMenuVisible = ref(false);
+const isEditVisible = ref(false);
+const isDeleteConfirmVisible = ref(false);
 
 const toggleMenu = (event) => {
   event.stopPropagation();
-  if (!menuVisible.value) {
+  if (!isMenuVisible.value) {
     closeAllMenus();
   }
-  menuVisible.value = !menuVisible.value;
+  isMenuVisible.value = !isMenuVisible.value;
 };
-
-
 const closeMenu = () => {
-  menuVisible.value = false
+  isMenuVisible.value = false
 };
-
 const closeAllMenus = () => {
   const event = new CustomEvent('close-all-menus');
   window.dispatchEvent(event);
 };
-
 window.addEventListener('close-all-menus', closeMenu);
+
+const closeEditWindow = () => {
+  isEditVisible.value = false;
+};
+const openEditWindow = () => {
+  isEditVisible.value = true;
+};
+
+const closeDeleteConfirmWindow = () => {
+  isDeleteConfirmVisible.value = false;
+};
+const openDeleteConfirm = () => {
+  isDeleteConfirmVisible.value = true;
+};
 
 </script>
 

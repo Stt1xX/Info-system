@@ -2,7 +2,6 @@ package com.example.backend.entities;
 
 import com.example.backend.entities.enums.Mood;
 import com.example.backend.entities.enums.WeaponType;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -25,7 +24,7 @@ public class Human extends ManagedEntity {
     private Coordinates coordinates;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "creation_date", nullable = false)
+    @Column(name = "creation_date", insertable = false, updatable = false)
     private Instant creationDate;
 
     @Column(name = "real_hero")
@@ -49,7 +48,7 @@ public class Human extends ManagedEntity {
     private String soundtrackName;
 
     @Column(name = "minutes_of_waiting")
-    private Integer minutesOfWaiting;
+    private Long minutesOfWaiting;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "weapon_type", nullable = false)
@@ -58,7 +57,7 @@ public class Human extends ManagedEntity {
     public Human(String name, WeaponType weaponType, Long minutesOfWaiting, Integer impactSpeed, String soundtrackName, Mood mood, Boolean hasToothpick, Boolean realHero) {
         this.name = name;
         this.weaponType = weaponType;
-        this.minutesOfWaiting = minutesOfWaiting.intValue();
+        this.minutesOfWaiting = minutesOfWaiting;
         this.impactSpeed = impactSpeed;
         this.soundtrackName = soundtrackName;
         this.mood = mood;
@@ -126,8 +125,8 @@ public class Human extends ManagedEntity {
         this.car = car;
     }
 
-    public Mood getMood() {
-        return mood;
+    public String getMood() {
+        return mood.getDisplayName();
     }
 
     public void setMood(Mood mood) {
@@ -150,20 +149,37 @@ public class Human extends ManagedEntity {
         this.soundtrackName = soundtrackName;
     }
 
-    public Integer getMinutesOfWaiting() {
+    public Long getMinutesOfWaiting() {
         return minutesOfWaiting;
     }
 
-    public void setMinutesOfWaiting(Integer minutesOfWaiting) {
+    public void setMinutesOfWaiting(Long minutesOfWaiting) {
         this.minutesOfWaiting = minutesOfWaiting;
     }
 
-    public WeaponType getWeaponType() {
-        return weaponType;
+    public String getWeaponType() {
+        return weaponType.getDisplayName();
     }
 
     public void setWeaponType(WeaponType weaponType) {
         this.weaponType = weaponType;
     }
 
+    @Override
+    public String toString() {
+        return "Human{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", coordinates=" + coordinates +
+                ", creationDate=" + creationDate +
+                ", realHero=" + realHero +
+                ", hasToothpick=" + hasToothpick +
+                ", car=" + car +
+                ", mood=" + mood +
+                ", impactSpeed=" + impactSpeed +
+                ", soundtrackName='" + soundtrackName + '\'' +
+                ", minutesOfWaiting=" + minutesOfWaiting +
+                ", weaponType=" + weaponType +
+                '}';
+    }
 }

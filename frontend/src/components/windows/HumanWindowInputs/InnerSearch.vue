@@ -15,7 +15,7 @@
       <svg @click="addNewItem" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="size-11 text-gray-500 ml-2 hover:text-white hover:bg-gray-700 rounded-full transition-colors duration-300 cursor-pointer p-2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>
-      <component :is="addEditWindow" :visible="showAddEditWindow" @close="closeAddEditWindow"
+      <component :is="addEditWindow" v-if="showAddEditWindow" @close="closeAddEditWindow"
                  :title="'Add new car'" :type="AddEditWindowType.ADDING" class="fixed inset-0 z-50" />
     </div>
     <div v-if="showDropdown && items.length > 0" class="absolute ml-[54px] left-1/2 transform -translate-x-1/2 w-1/2 bg-gray-700 border border-gray-600 rounded mt-1 z-10">
@@ -64,7 +64,6 @@ const emit = defineEmits(['choose']);
 
 const selectItem = (item) => {
   emit('choose', item);
-  showDropdown.value = false;
 };
 
 const handleClickOutside = (event) => {

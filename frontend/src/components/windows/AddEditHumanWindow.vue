@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
+  <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
     <h1 class="text-2xl font-bold mb-6 text-center">{{ title }}</h1>
     <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-[900px] max-w-3xl">
       <div class="relative flex justify-between mb-10">
@@ -38,17 +38,26 @@
 </template>
 
 <script setup>
-import {ref, watch} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import SettingCar from "@/components/windows/HumanWindowInputs/SettingCar.vue";
 import SettingCoordinates from "@/components/windows/HumanWindowInputs/SettingCoordinates.vue";
 import Preview from "@/components/windows/HumanWindowInputs/Preview.vue";
 import SettingHuman from "@/components/windows/HumanWindowInputs/SettingHuman.vue";
-import {AddHumanPageNumber} from "@/js/utils.js";
+import {AddEditWindowType, AddHumanPageNumber} from "@/js/utils.js";
+import {token} from "@/js/csrf-token.js";
+import {showAlert} from "@/js/custom-alert.js";
 
 const props = defineProps({
-  visible: Boolean,
   title: String,
   type: Number,
+  item: {
+    type : Object,
+    default : {
+      human: {},
+      car: {},
+      coordinates: {}
+    }
+  }
 });
 
 const emit = defineEmits(['close']);
@@ -62,8 +71,24 @@ const formData = ref({
   human: {},
 });
 
+
+onMounted(() => {
+  pages.value[AddHumanPageNumber.SET_HUMAN].selectedHuman = {
+    name: props.item.name,
+    soundtrackName: props.item.soundtrackName,
+    impactSpeed: props.item.impactSpeed,
+    minutesOfWaiting: props.item.minutesOfWaiting,
+    weaponType: props.item.weaponType,
+    mood: props.item.mood,
+    realHero: props.item.realHero,
+    hasToothpick: props.item.hasToothpick
+  }
+  pages.value[AddHumanPageNumber.SET_CAR].selectedCar = props.item.car;
+  pages.value[AddHumanPageNumber.SET_COORDINATES].selectedCoordinates = props.item.coordinates;
+});
+
 watch(
-    () => pages.value[AddHumanPageNumber.SET_HUMAN]?.formData,
+    () => pages.value[AddHumanPageNumber.SET_HUMAN]?.selectedHuman,
     (newValue) => {
       formData.value.human = newValue;
     }
@@ -98,7 +123,7 @@ const nextStep = () => {
   if (currentStep.value < steps.length) {
     currentStep.value++;
   } else {
-    saveData();
+    saveHuman();
   }
 };
 
@@ -114,8 +139,46 @@ const goToStep = (step) => {
   }
 };
 
-const saveData = () => {
-  // save data
+const saveHuman = () => {
+  if (props.type === AddEditWindowType.ADDING) {
+    request('/humans/add', 'POST')
+  } else {
+    request('/humans/update/' + props.item.id, 'PATCH')
+  }
   closeModal();
 };
+
+const getDTO = () => {
+  return {
+    'name' : formData.value.human.name,
+    'soundtrackName' : formData.value.human.soundtrackName,
+    'impactSpeed' : Number(formData.value.human.impactSpeed),
+    'minutesOfWaiting' : Number(formData.value.human.minutesOfWaiting),
+    'weaponType' : formData.value.human.weaponType,
+    'mood' : formData.value.human.mood,
+    'realHero' : formData.value.human.realHero,
+    'hasToothpick' : formData.value.human.hasToothpick,
+    'carId' : formData.value.car.id,
+    'coordinatesId' : formData.value.coordinates.id
+  }
+}
+
+const request = (url, type) => {
+  $.ajax({
+    url: url,
+    type: type,
+    contentType: 'application/json',
+    headers: {
+      'X-CSRF-Token': token.value
+    },
+    data: JSON.stringify(getDTO()),
+    success: function (data) {
+      showAlert(data)
+    },
+    error: function (error) {
+      showAlert(error.responseText)
+    }
+  })
+}
+
 </script>

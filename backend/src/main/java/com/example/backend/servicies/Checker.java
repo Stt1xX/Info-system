@@ -39,7 +39,7 @@ public class Checker {
                 humanDTO.getName().isEmpty()){
             return new ResponseEntity<>("Error: Human's name cannot be empty", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
-        if (humanDTO.getCarId() == null ||
+            if (humanDTO.getCarId() == null ||
                 humanDTO.getCarId() < 0){
             return new ResponseEntity<>("Error: Human's car ID cannot be empty or lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
         }

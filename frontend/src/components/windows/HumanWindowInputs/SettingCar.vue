@@ -36,11 +36,9 @@ import {ItemType} from "@/js/utils.js";
 
 const selectedCar = ref(null);
 const Error = ref('');
-const dropdownVisible = ref(false);
 
 const selectCar = (car) => {
   selectedCar.value = car;
-  dropdownVisible.value = false;
 };
 
 const validate = () => {

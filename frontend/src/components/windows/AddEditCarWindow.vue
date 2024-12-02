@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
+  <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
     <h1 class="text-2xl font-bold mb-6 text-center">{{ title }}</h1>
     <div class="login-container bg-gray-800 p-4 rounded-lg shadow-lg w-[360px]">
       <form @submit.prevent="saveCar" class="space-y-4">
@@ -26,7 +26,6 @@ import {token} from "@/js/csrf-token.js";
 import {AddEditWindowType} from "@/js/utils.js";
 import {showAlert} from "@/js/custom-alert.js";
 const props = defineProps({
-  visible: Boolean,
   title: String,
   type: Number,
   item: {

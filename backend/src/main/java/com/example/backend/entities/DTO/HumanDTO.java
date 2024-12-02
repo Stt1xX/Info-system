@@ -17,24 +17,19 @@ public class HumanDTO {
     private Long minutesOfWaiting;
     private WeaponType weaponType;
 
-    public HumanDTO() {
-    }
-
     public Human convertToHuman(){
         return new Human(name, weaponType, minutesOfWaiting, impactSpeed, soundtrackName, mood, hasToothpick, realHero);
     }
 
-    public HumanDTO(String name, WeaponType weaponType, Long minutesOfWaiting, Integer impactSpeed, String soundtrackName, Mood mood, Boolean hasToothpick, Boolean realHero, Integer carId, Integer coordinatesId) {
-        this.name = name;
-        this.weaponType = weaponType;
-        this.minutesOfWaiting = minutesOfWaiting;
-        this.impactSpeed = impactSpeed;
-        this.soundtrackName = soundtrackName;
-        this.mood = mood;
-        this.hasToothpick = hasToothpick;
-        this.realHero = realHero;
-        this.carId = carId;
-        this.coordinatesId = coordinatesId;
+    public static void setHuman(Human human, HumanDTO humanDTO) {
+        human.setName(humanDTO.getName());
+        human.setRealHero(humanDTO.getRealHero());
+        human.setHasToothpick(humanDTO.getHasToothpick());
+        human.setMood(humanDTO.getMood());
+        human.setImpactSpeed(humanDTO.getImpactSpeed());
+        human.setSoundtrackName(humanDTO.getSoundtrackName());
+        human.setWeaponType(humanDTO.getWeaponType());
+        human.setMinutesOfWaiting(humanDTO.getMinutesOfWaiting());
     }
 
     public String getName() {
@@ -81,8 +76,8 @@ public class HumanDTO {
         return mood;
     }
 
-    public void setMood(Mood mood) {
-        this.mood = mood;
+    public void setMood(String mood) {
+        this.mood = Mood.fromDisplayName(mood);
     }
 
     public Integer getImpactSpeed() {
@@ -105,8 +100,8 @@ public class HumanDTO {
         return weaponType;
     }
 
-    public void setWeaponType(WeaponType weaponType) {
-        this.weaponType = weaponType;
+    public void setWeaponType(String weaponType) {
+        this.weaponType = WeaponType.fromDisplayName(weaponType);
     }
 
     public Long getMinutesOfWaiting() {
