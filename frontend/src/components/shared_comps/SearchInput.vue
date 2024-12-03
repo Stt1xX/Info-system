@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center p-4 rounded-lg pl-0">
     <div class="relative" ref="dropdown">
       <div @click="toggleDropdown" class="h-14 text-center w-40 rounded-l-full bg-gray-700 focus:outline-none hover:cursor-pointer flex items-center justify-between px-4">
-        <span>{{ selectedOption.backName }}</span>
+        <span>{{ selectedOption.frontName }}</span>
         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
       </div>
       <ul v-if="isDropdownOpen" class="absolute z-10 w-full bg-gray-700 rounded-lg mt-1">

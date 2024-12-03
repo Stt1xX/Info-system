@@ -1,5 +1,7 @@
 package com.example.backend.entities;
 
+import com.example.backend.entities.Anntotations.SearchableField;
+import com.example.backend.entities.Anntotations.SortableField;
 import com.example.backend.entities.enums.Mood;
 import com.example.backend.entities.enums.WeaponType;
 import jakarta.persistence.*;
@@ -14,9 +16,13 @@ public class Human extends ManagedEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ColumnDefault("nextval('humans_id_seq')")
     @Column(name = "human_id", nullable = false)
+    @SortableField(name = "id")
+    @SearchableField(name = "id")
     private Integer id;
 
     @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
+    @SortableField(name = "name")
+    @SearchableField(name = "name")
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -44,16 +50,24 @@ public class Human extends ManagedEntity {
     private Mood mood;
 
     @Column(name = "impact_speed", nullable = false)
+    @SortableField(name = "impact speed")
+    @SearchableField(name = "impact speed")
     private Integer impactSpeed;
 
     @Column(name = "soundtrack_name", nullable = false, length = Integer.MAX_VALUE)
+    @SortableField(name = "soundtrack name")
+    @SearchableField(name = "soundtrack name")
     private String soundtrackName;
 
     @Column(name = "minutes_of_waiting")
+    @SortableField(name = "minutes of waiting")
+    @SearchableField(name = "minutes of waiting")
     private Long minutesOfWaiting;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "weapon_type", nullable = false)
+    @SortableField(name = "weapon type")
+    @SearchableField(name = "weapon type")
     private WeaponType weaponType;
 
     public Human(String name, WeaponType weaponType, Long minutesOfWaiting, Integer impactSpeed, String soundtrackName, Mood mood, Boolean hasToothpick, Boolean realHero) {
