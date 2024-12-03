@@ -4,6 +4,7 @@ import com.example.backend.entities.Car;
 import com.example.backend.entities.Coordinates;
 import com.example.backend.entities.DTO.HumanDTO;
 import com.example.backend.entities.Human;
+import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.CarRepository;
 import com.example.backend.repositories.CoordinatesRepository;
 import com.example.backend.repositories.HumanRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,8 +25,8 @@ public class HumanService extends ItemService<HumanDTO, Human> {
     private final CoordinatesRepository coordinatesRepository;
 
     @Autowired
-    public HumanService(HumanRepository humanRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, CarRepository carRepository, CoordinatesRepository coordinatesRepository) {
-        super(humanRepository, userService, simpMessagingTemplate, checker);
+    public HumanService(HumanRepository humanRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, CarRepository carRepository, CoordinatesRepository coordinatesRepository) {
+        super(humanRepository, userService, auditService, simpMessagingTemplate, checker, Human.class);
         this.carRepository = carRepository;
         this.coordinatesRepository = coordinatesRepository;
     }
@@ -48,8 +50,12 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             human.setCar(carOptional.get());
             human.setCoordinates(coordinatesOptional.get());
             human.setAuthor(userService.getCurrentUser().getUsername());
-            repository.save(human);
+            Human updatedHuman = repository.save(human);
             simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+            resp = auditService.doCommit(updatedHuman.getId(), EntityType.HUMAN, "Create");
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
             return new ResponseEntity<>(String.format("Human %s successfully added!", human.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             System.out.println(e.getMessage());
@@ -83,8 +89,12 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             }
             human.setCar(carOptional.get());
             human.setCoordinates(coordinatesOptional.get());
-            repository.save(human);
+            Human updatedHuman = repository.save(human);
             simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+            resp = auditService.doCommit(updatedHuman.getId(), EntityType.HUMAN, "Update");
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
             return new ResponseEntity<>(String.format("Human %s successfully updated!", human.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             System.out.println(e.getMessage());
@@ -103,15 +113,16 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             return resp;
         }
         repository.delete(human);
+        auditService.deleteCommits(id, EntityType.HUMAN);
         simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
         return new ResponseEntity<>(String.format("Human %s successfully deleted!", human.getName()), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> countByCarId(Integer carId) {
-        return ResponseEntity.ok(((HumanRepository) (this.repository)).countByCar_Id(carId));
+    public List<Human> findByCarId(Integer carId) {
+        return ((HumanRepository) (this.repository)).findAllByCar_Id(carId);
     }
 
-    public ResponseEntity<?> countByCoordinatesId(Integer carId) {
-        return ResponseEntity.ok(((HumanRepository) (this.repository)).countByCoordinates_Id(carId));
+    public List<Human> findByCoordinatesId(Integer carId) {
+        return ((HumanRepository) (this.repository)).findAllByCoordinates_Id(carId);
     }
 }

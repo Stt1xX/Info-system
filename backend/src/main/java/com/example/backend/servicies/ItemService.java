@@ -28,16 +28,20 @@ public abstract class ItemService<ClassDTO , MainClass> {
     protected final JpaRepository<MainClass, Integer> repository;
     protected final JpaSpecificationExecutor<MainClass> specificationExecutor;
     protected final UserService userService;
+    protected final AuditService auditService;
     protected final SimpMessagingTemplate simpMessagingTemplate;
     protected final Checker checker;
+    protected final Class<MainClass> mainClassType;
 
     @Autowired
-    public ItemService(JpaRepository<MainClass, Integer> repository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker) {
+    public ItemService(JpaRepository<MainClass, Integer> repository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, Class<MainClass> mainClassType) {
         this.repository = repository;
         this.specificationExecutor = (JpaSpecificationExecutor<MainClass>) repository;
         this.userService = userService;
+        this.auditService = auditService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.checker = checker;
+        this.mainClassType = mainClassType;
     }
 
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
@@ -46,10 +50,14 @@ public abstract class ItemService<ClassDTO , MainClass> {
 
     public abstract ResponseEntity<?> delete(Integer id);
 
+    public ResponseEntity<?> getCommits(Integer id, Integer pageNumber){
+        return auditService.getCommits(id, pageNumber, mainClassType);
+    }
+
     public ResponseEntity<?> getAll(PageRequestDTO pageRequest) {
         Sort sort = pageRequest.isOrder() ? Sort.by(pageRequest.getSortBy()).ascending() : Sort.by(pageRequest.getSortBy()).descending();
         Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(), sort);
-        Specification<MainClass> spec = (Specification<MainClass>) hasNameContaining(pageRequest.getTemplate(), pageRequest.getVarName());
+            Specification<MainClass> spec = (Specification<MainClass>) hasNameContaining(pageRequest.getTemplate(), pageRequest.getVarName());
         Page<MainClass> page;
         try{
             page = specificationExecutor.findAll(spec, pageable);
@@ -61,7 +69,7 @@ public abstract class ItemService<ClassDTO , MainClass> {
                 new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements())));
     }
 
-    public Map<String, String> getSocketMessage(){
+    protected Map<String, String> getSocketMessage(){
         Map<String, String> response = new HashMap<>();
         response.put("user_id", userService.getCurrentUser().getId().toString());
         response.put("signal", "update");

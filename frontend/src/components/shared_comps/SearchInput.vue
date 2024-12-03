@@ -6,7 +6,7 @@
         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
       </div>
       <ul v-if="isDropdownOpen" class="absolute z-10 w-full bg-gray-700 rounded-lg mt-1">
-        <li v-for="option in options" :key="option" @click="selectOption(option)" class="px-4 py-2 hover:bg-gray-600 cursor-pointer">{{ option.frontName }}</li>
+        <li v-for="option in options" :key="option" @click="selectOption(option)" class="px-4 py-2 hover:bg-gray-600 cursor-pointer first:rounded-t-lg last:rounded-b-lg">{{ option.frontName }}</li>
       </ul>
     </div>
     <input v-model="inputValue" type="text" placeholder="Enter value" class="h-14 w-full p-4 bg-gray-700 focus:outline-none border-none rounded-none"/>

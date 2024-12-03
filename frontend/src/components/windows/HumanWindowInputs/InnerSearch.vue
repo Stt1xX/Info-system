@@ -24,7 +24,7 @@
         <p v-if="itemType === ItemType.COORDINATES_HUMAN_SEARCH">({{ item.x }}; {{item.y}})</p>
         <p>{{ item.author }}</p>
       </div>
-      <PaginationButtons :item-type="itemType" ref="paginationButtons" />
+      <PaginationItems :item-type="itemType" ref="paginationButtons" />
     </div>
   </div>
 </template>
@@ -34,7 +34,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { AddEditWindowType, ItemType } from "@/js/utils.js";
 import SelectorFieldInnerSearch from "@/components/windows/HumanWindowInputs/SelectorFieldInnerSearch.vue";
 import { get, objects } from "@/js/items-ws.js";
-import PaginationButtons from "@/components/shared_comps/PaginationButtons.vue";
+import PaginationItems from "@/components/shared_comps/PaginationItems.vue";
 
 const searchQuery = ref('');
 const showDropdown = ref(false);

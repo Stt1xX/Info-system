@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
+  <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-40">
     <h1 class="text-2xl font-bold mb-6 text-center">{{ title }}</h1>
     <div class="login-container bg-gray-800 p-4 rounded-lg shadow-lg w-[360px]">
       <form class="login-form space-y-4">

@@ -44,6 +44,11 @@ public abstract class ItemController<ClassDTO, MainClass> {
         return itemService.delete(id);
     }
 
+    @GetMapping("/get_commits/{id}/{pageNumber}")
+    public ResponseEntity<?> getCommits(@PathVariable Integer id, @PathVariable Integer pageNumber) {
+        return itemService.getCommits(id, pageNumber);
+    }
+
     @GetMapping("/get_sortable_fields")
     public List<FieldsDTO> getSortableFields() {
         return Utils.getFields(mainClass, SortableField.class);

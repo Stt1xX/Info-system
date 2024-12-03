@@ -7,21 +7,24 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class Utils {
+
     public static String prepareDate(Instant instant) {
         if (instant == null) {
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneOffset.UTC);
-        return formatter.format(instant);
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH : mm, MMM dd, yyyy", Locale.ENGLISH);
+        return zonedDateTime.format(formatter);
     }
 
     public static List<FieldsDTO> getFields(Class<?> clazz, Class<? extends Annotation> annotation) {

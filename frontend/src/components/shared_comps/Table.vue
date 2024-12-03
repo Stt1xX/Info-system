@@ -25,7 +25,7 @@
       <component :is="item" v-for="obj in objects[itemType].data" :key="obj.id" :obj="obj"/>
     </div>
   </div>
-  <PaginationButtons :itemType="itemType"/>
+  <PaginationItems :itemType="itemType" class="mt-4"/>
 </template>
 
 <script setup>
@@ -33,7 +33,7 @@ import {ref} from 'vue';
 import SearchInput from "@/components/shared_comps/SearchInput.vue";
 import SortButton from "@/components/buttons/SortButton.vue";
 import AdditionalFuncButton from "@/components/buttons/AdditionalFuncButton.vue";
-import PaginationButtons from "@/components/shared_comps/PaginationButtons.vue";
+import PaginationItems from "@/components/shared_comps/PaginationItems.vue";
 
 import {AddEditWindowType, getHeader, getItemName} from "@/js/utils.js";
 import {objects} from "@/js/items-ws.js";

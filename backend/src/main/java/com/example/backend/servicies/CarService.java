@@ -2,6 +2,8 @@ package com.example.backend.servicies;
 
 import com.example.backend.entities.Car;
 import com.example.backend.entities.DTO.CarDTO;
+import com.example.backend.entities.Human;
+import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class CarService extends ItemService<CarDTO, Car> {
@@ -16,8 +19,8 @@ public class CarService extends ItemService<CarDTO, Car> {
     private final HumanService humanService;
 
     @Autowired
-    public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanService humanService) {
-        super(carRepository, userService, simpMessagingTemplate, checker);
+    public CarService(CarRepository carRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanService humanService) {
+        super(carRepository, userService, auditService, simpMessagingTemplate, checker, Car.class);
         this.humanService = humanService;
     }
 
@@ -32,8 +35,12 @@ public class CarService extends ItemService<CarDTO, Car> {
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
         try{
-            repository.save(car);
+            Car savedCar = repository.save(car);
             simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
+            resp = auditService.doCommit(savedCar.getId(), EntityType.CAR, "Create");
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
             return new ResponseEntity<>(String.format("Car %s successfully added!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
@@ -57,8 +64,15 @@ public class CarService extends ItemService<CarDTO, Car> {
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
         try{
-            repository.save(car);
+            List<Human> depends = getDepends(id);
+            Car updatedCar = repository.save(car);
             simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
+            if (!depends.isEmpty())
+                simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+            resp = auditService.doCommit(updatedCar.getId(), EntityType.CAR, "Update");
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
             return new ResponseEntity<>(String.format("Car %s successfully updated!", car.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
@@ -75,18 +89,20 @@ public class CarService extends ItemService<CarDTO, Car> {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        boolean update = false;
-        if (getDependsCount(id).getBody() != null)
-            if ((long) getDependsCount(id).getBody() > 0)
-                update = true;
+        List<Human> depends = getDepends(id);
         repository.delete(car);
-        if (update)
+        if (!depends.isEmpty()){
+            for (Human human : depends) {
+                auditService.deleteCommits(human.getId(), EntityType.HUMAN);
+            }
             simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+        }
+        auditService.deleteCommits(id, EntityType.CAR);
         simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
         return new ResponseEntity<>(String.format("Car %s successfully deleted!", car.getName()), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getDependsCount(Integer id) {
-        return humanService.countByCarId(id);
+    public List<Human> getDepends(Integer id) {
+        return humanService.findByCarId(id);
     }
 }

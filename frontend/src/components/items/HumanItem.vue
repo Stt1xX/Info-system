@@ -5,7 +5,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v.01M12 12v.01M12 18v.01"></path>
       </svg>
     </button>
-    <DropdownMenu v-if="isMenuVisible" @edit="openEditWindow" @delete="openDeleteConfirm" @close="closeMenu" />
+    <DropdownMenu v-if="isMenuVisible" @edit="openEditWindow" @delete="openDeleteConfirm" @close="closeMenu" @history="openHistoryWindow" />
     <div class="px-6 py-4 flex items-center">
       <div class="flex-grow w-52">
         <div class="font-bold text-xl mb-2">{{obj.name}}</div>
@@ -17,10 +17,12 @@
       <HumanLogo class="w-[108px] h-[108px] mr-14" />
     </div>
   </div>
-  <AddEditHumanWindow v-if="isEditVisible" @close="closeEditWindow" :title="'Edit ' + getItemName(ItemType.HUMAN)" :item="obj" :type="AddEditWindowType.EDITING" class="fixed inset-0 z-40"/>
-  <ConfirmDeleteMenu v-if="isDeleteConfirmVisible"
+  <AddEditHumanWindow v-if="isEditVisible" @close="closeEditWindow" :title="'Edit ' + getItemName(ItemType.HUMAN)" :item="obj" :type="AddEditWindowType.EDITING"/>
+  <ConfirmDeleteWindow v-if="isDeleteConfirmVisible"
                      :id="obj.id" :item-code="ItemType.HUMAN" :author="obj.author"
                      @close="closeDeleteConfirmWindow" />
+  <HistoryWindow v-if="isHistoryVisible" @close="closeHistoryWindow"
+                 :id="obj.id" :itemCode="ItemType.HUMAN"/>
 </template>
 
 <script setup>
@@ -29,7 +31,8 @@ import HumanLogo from "@/components/logos/HumanLogo.vue";
 import DropdownMenu from "@/components/shared_comps/DropdownMenu.vue";
 import AddEditHumanWindow from '@/components/windows/AddEditHumanWindow.vue';
 import {AddEditWindowType, getItemName, ItemType} from "@/js/utils.js";
-import ConfirmDeleteMenu from "@/components/shared_comps/ConfirmDeleteMenu.vue";
+import ConfirmDeleteWindow from "@/components/windows/ConfirmDeleteWindow.vue";
+import HistoryWindow from "@/components/windows/HistoryWindow.vue";
 
 const props = defineProps({
   obj: Object
@@ -38,6 +41,7 @@ const props = defineProps({
 const isMenuVisible = ref(false);
 const isEditVisible = ref(false);
 const isDeleteConfirmVisible = ref(false);
+const isHistoryVisible = ref(false);
 
 const toggleMenu = (event) => {
   event.stopPropagation();
@@ -67,6 +71,13 @@ const closeDeleteConfirmWindow = () => {
 };
 const openDeleteConfirm = () => {
   isDeleteConfirmVisible.value = true;
+};
+
+const closeHistoryWindow = () => {
+  isHistoryVisible.value = false;
+};
+const openHistoryWindow = () => {
+  isHistoryVisible.value = true;
 };
 
 </script>

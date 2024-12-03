@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
+  <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-40">
     <h1 class="text-2xl font-bold mb-6 text-center">{{ title }}</h1>
     <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-[900px] max-w-3xl">
       <div class="relative flex justify-between mb-10">
@@ -85,6 +85,9 @@ onMounted(() => {
   }
   pages.value[AddHumanPageNumber.SET_CAR].selectedCar = props.item.car;
   pages.value[AddHumanPageNumber.SET_COORDINATES].selectedCoordinates = props.item.coordinates;
+  if (props.type === AddEditWindowType.EDITING) {
+    currentStep.value = AddHumanPageNumber.PREVIEW;
+  }
 });
 
 watch(
