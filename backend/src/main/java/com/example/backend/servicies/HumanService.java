@@ -38,7 +38,8 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             return resp;
         }
         try{
-            Human human = humanDTO.convertToHuman();
+            Human human = new Human();
+            HumanDTO.setHuman(human, humanDTO);
             Optional<Car> carOptional = carRepository.findById(humanDTO.getCarId());
             Optional<Coordinates> coordinatesOptional = coordinatesRepository.findById(humanDTO.getCoordinatesId());
             if (carOptional.isEmpty()) {

@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.backend.repositories.DunamicQuery.Specification.hasNameContaining;
@@ -67,6 +68,10 @@ public abstract class ItemService<ClassDTO , MainClass> {
         }
         return ResponseEntity.ok(new PageResponseDTO<>(page.getContent(),
                 new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements())));
+    }
+
+    public List<MainClass> getAll(){
+        return repository.findAll();
     }
 
     protected Map<String, String> getSocketMessage(){

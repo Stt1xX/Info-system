@@ -17,10 +17,6 @@ public class HumanDTO {
     private Long minutesOfWaiting;
     private WeaponType weaponType;
 
-    public Human convertToHuman(){
-        return new Human(name, weaponType, minutesOfWaiting, impactSpeed, soundtrackName, mood, hasToothpick, realHero);
-    }
-
     public static void setHuman(Human human, HumanDTO humanDTO) {
         human.setName(humanDTO.getName());
         human.setRealHero(humanDTO.getRealHero());
@@ -30,6 +26,19 @@ public class HumanDTO {
         human.setSoundtrackName(humanDTO.getSoundtrackName());
         human.setWeaponType(humanDTO.getWeaponType());
         human.setMinutesOfWaiting(humanDTO.getMinutesOfWaiting());
+    }
+
+    public HumanDTO(Human human){
+        this.name = human.getName();
+        this.coordinatesId = human.getCoordinates().getId();
+        this.carId = human.getCar().getId();
+        this.realHero = human.getRealHero();
+        this.hasToothpick = human.getHasToothpick();
+        this.mood = Mood.fromDisplayName(human.getMood());
+        this.impactSpeed = human.getImpactSpeed();
+        this.soundtrackName = human.getSoundtrackName();
+        this.minutesOfWaiting = human.getMinutesOfWaiting();
+        this.weaponType = WeaponType.fromDisplayName(human.getWeaponType());
     }
 
     public String getName() {
