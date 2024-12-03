@@ -98,7 +98,6 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             }
             return new ResponseEntity<>(String.format("Human %s successfully updated!", human.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>("Error: Incorrect human's input data", HttpStatus.CONFLICT);
         }
     }
@@ -125,5 +124,13 @@ public class HumanService extends ItemService<HumanDTO, Human> {
 
     public List<Human> findByCoordinatesId(Integer carId) {
         return ((HumanRepository) (this.repository)).findAllByCoordinates_Id(carId);
+    }
+
+    public void save(Human human) {
+        repository.save(human);
+    }
+
+    public List<Human> findAllByImpactSpeed(Integer impactSpeed) {
+        return ((HumanRepository) (this.repository)).findAllByImpactSpeed(impactSpeed);
     }
 }

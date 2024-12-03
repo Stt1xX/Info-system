@@ -18,6 +18,13 @@ export const AddHumanPageNumber = {
     PREVIEW : 4
 }
 
+export const AdditionalFunctionalType = {
+    SET_MOOD : 1,
+    TRANSFER_HEROES : 2,
+    SOUNDTRACK_NUMBER : 3,
+    DELETE_BY_IMPACT_SPEED : 4
+}
+
 export const getItemName = (value) => {
     switch (value){
         case ItemType.CAR:

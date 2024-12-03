@@ -28,6 +28,9 @@ public class HumanDTO {
         human.setMinutesOfWaiting(humanDTO.getMinutesOfWaiting());
     }
 
+    public HumanDTO() {
+    }
+
     public HumanDTO(Human human){
         this.name = human.getName();
         this.coordinatesId = human.getCoordinates().getId();

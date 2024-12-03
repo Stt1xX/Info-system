@@ -105,4 +105,12 @@ public class CarService extends ItemService<CarDTO, Car> {
     public List<Human> getDepends(Integer id) {
         return humanService.findByCarId(id);
     }
+
+    public Car findByName(String name) {
+        return ((CarRepository) (repository)).findCarByName(name);
+    }
+
+    public Car save(Car car) {
+        return repository.save(car);
+    }
 }

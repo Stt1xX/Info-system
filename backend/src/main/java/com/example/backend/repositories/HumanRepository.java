@@ -10,4 +10,5 @@ import java.util.List;
 public interface HumanRepository extends JpaRepository<Human, Integer>, JpaSpecificationExecutor<Human> {
     List<Human> findAllByCar_Id(Integer carId);
     List<Human> findAllByCoordinates_Id(Integer coordinatesId);
+    List<Human> findAllByImpactSpeed(Integer impactSpeed);
 }
