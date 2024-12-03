@@ -5,7 +5,7 @@ import SockJS from "sockjs-client";
 import {getUrlPrefix, ItemType} from "@/js/utils.js";
 
 const defObj = (page_size) => ({
-    data: [],
+    data: [{}],
     total_pages: 0,
     page_number: 0,
     size_number: page_size,

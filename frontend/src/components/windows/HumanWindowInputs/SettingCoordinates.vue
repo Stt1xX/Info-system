@@ -44,7 +44,7 @@ const selectCoordinates = (coordinates) => {
 };
 
 const validate = () => {
-  if (!selectedCoordinates.value) {
+  if (!selectedCoordinates.value.id) {
     Error.value = "Coordinates can't be null";
     return false;
   }

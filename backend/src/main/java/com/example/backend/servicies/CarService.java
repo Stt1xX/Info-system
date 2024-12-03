@@ -13,9 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CarService extends ItemService<CarDTO, Car> {
 
+    private final HumanService humanService;
+
     @Autowired
-    public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker) {
+    public CarService(CarRepository carRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanService humanService) {
         super(carRepository, userService, simpMessagingTemplate, checker);
+        this.humanService = humanService;
     }
 
     @Override
@@ -72,8 +75,18 @@ public class CarService extends ItemService<CarDTO, Car> {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
+        boolean update = false;
+        if (getDependsCount(id).getBody() != null)
+            if ((long) getDependsCount(id).getBody() > 0)
+                update = true;
         repository.delete(car);
+        if (update)
+            simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
         simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
         return new ResponseEntity<>(String.format("Car %s successfully deleted!", car.getName()), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getDependsCount(Integer id) {
+        return humanService.countByCarId(id);
     }
 }

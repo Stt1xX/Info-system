@@ -20,7 +20,8 @@ public class Human extends ManagedEntity {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "coordinates_id", nullable = false)
+    @JoinColumn(name = "coordinates_id", nullable = false, foreignKey = @ForeignKey(name = "coordinates_id",
+            foreignKeyDefinition = "FOREIGN KEY (coordinates_id) REFERENCES coordinates(id) ON DELETE CASCADE"))
     private Coordinates coordinates;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -34,7 +35,8 @@ public class Human extends ManagedEntity {
     private Boolean hasToothpick;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "car_id", nullable = false)
+    @JoinColumn(name = "car_id", nullable = false, foreignKey = @ForeignKey(name = "car_id",
+            foreignKeyDefinition = "FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE CASCADE"))
     private Car car;
 
     @Enumerated(EnumType.STRING)
@@ -163,23 +165,5 @@ public class Human extends ManagedEntity {
 
     public void setWeaponType(WeaponType weaponType) {
         this.weaponType = weaponType;
-    }
-
-    @Override
-    public String toString() {
-        return "Human{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", coordinates=" + coordinates +
-                ", creationDate=" + creationDate +
-                ", realHero=" + realHero +
-                ", hasToothpick=" + hasToothpick +
-                ", car=" + car +
-                ", mood=" + mood +
-                ", impactSpeed=" + impactSpeed +
-                ", soundtrackName='" + soundtrackName + '\'' +
-                ", minutesOfWaiting=" + minutesOfWaiting +
-                ", weaponType=" + weaponType +
-                '}';
     }
 }

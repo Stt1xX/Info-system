@@ -15,8 +15,8 @@ import java.util.List;
 @RestController
 public abstract class ItemController<ClassDTO, MainClass> {
 
-    private final ItemService<ClassDTO, MainClass> itemService;
-    private final Class<MainClass> mainClass;
+    protected final ItemService<ClassDTO, MainClass> itemService;
+    protected final Class<MainClass> mainClass;
 
     @Autowired
     public ItemController(ItemService<ClassDTO, MainClass> itemService, Class<MainClass> mainClass) {

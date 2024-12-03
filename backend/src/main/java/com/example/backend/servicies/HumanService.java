@@ -106,4 +106,12 @@ public class HumanService extends ItemService<HumanDTO, Human> {
         simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
         return new ResponseEntity<>(String.format("Human %s successfully deleted!", human.getName()), HttpStatus.OK);
     }
+
+    public ResponseEntity<?> countByCarId(Integer carId) {
+        return ResponseEntity.ok(((HumanRepository) (this.repository)).countByCar_Id(carId));
+    }
+
+    public ResponseEntity<?> countByCoordinatesId(Integer carId) {
+        return ResponseEntity.ok(((HumanRepository) (this.repository)).countByCoordinates_Id(carId));
+    }
 }

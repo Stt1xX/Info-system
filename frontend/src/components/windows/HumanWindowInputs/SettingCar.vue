@@ -42,7 +42,7 @@ const selectCar = (car) => {
 };
 
 const validate = () => {
-  if (!selectedCar.value) {
+  if (!selectedCar.value.id) {
     Error.value = "Car can't be null";
     return false;
   }

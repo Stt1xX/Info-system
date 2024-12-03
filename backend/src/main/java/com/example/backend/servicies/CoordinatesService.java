@@ -13,9 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates> {
 
+    private final HumanService humanService;
+
     @Autowired
-    public CoordinatesService(CoordinatesRepository coordinatesRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker) {
+    public CoordinatesService(CoordinatesRepository coordinatesRepository, UserService userService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanService humanService) {
         super(coordinatesRepository, userService, simpMessagingTemplate, checker);
+        this.humanService = humanService;
     }
 
     @Override
@@ -73,8 +76,18 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
+        boolean update = false;
+        if (getDependsCount(id).getBody() != null)
+            if ((long) getDependsCount(id).getBody() > 0)
+                update = true;
         repository.delete(coordinates);
+        if (update)
+            simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
         simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
         return new ResponseEntity<>("Coordinates successfully deleted!", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getDependsCount(Integer id) {
+        return humanService.countByCoordinatesId(id);
     }
 }
