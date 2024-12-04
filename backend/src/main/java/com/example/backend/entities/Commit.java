@@ -20,10 +20,8 @@ public class Commit {
     @Column(name = "item_id", nullable = false)
     private Integer itemId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "author_id",
-            foreignKeyDefinition = "FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL"))
-    private User author;
+    @Column(name="author", nullable = false, length = Integer.MAX_VALUE)
+    private String author;
 
     @Column(name = "date", nullable = false)
     private String date;
@@ -55,11 +53,11 @@ public class Commit {
         this.itemType = itemType;
     }
 
-    public User getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
 

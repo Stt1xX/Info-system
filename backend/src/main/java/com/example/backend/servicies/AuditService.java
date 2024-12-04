@@ -55,14 +55,16 @@ public class AuditService {
 
                 new PageResponseDTO<>(page.getContent()
                         .stream()
-                        .map(commit -> new CommitDTO(commit.getDate(), commit.getAuthor().getUsername(), commit.getAction()))
+                        .map(commit -> new CommitDTO(commit.getDate(),
+                                commit.getAuthor(),
+                                commit.getAction()))
                         .toList(),
                 new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements())));
     }
 
     public ResponseEntity<?> doCommit(Integer entityId, EntityType entityType, String action){
         Commit commit = new Commit();
-        commit.setAuthor(userService.getCurrentUser());
+        commit.setAuthor(userService.getCurrentUser().getUsername());
         commit.setItemType(entityType);
         commit.setItemId(entityId);
         commit.setDate(Utils.prepareDate(Instant.now()));
