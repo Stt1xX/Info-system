@@ -25,7 +25,7 @@ public class Human extends ManagedEntity {
     @SearchableField(name = "name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coordinates_id", nullable = false, foreignKey = @ForeignKey(name = "coordinates_id",
             foreignKeyDefinition = "FOREIGN KEY (coordinates_id) REFERENCES coordinates(id) ON DELETE CASCADE"))
     private Coordinates coordinates;
@@ -40,7 +40,7 @@ public class Human extends ManagedEntity {
     @Column(name = "has_toothpick")
     private Boolean hasToothpick;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "car_id", nullable = false, foreignKey = @ForeignKey(name = "car_id",
             foreignKeyDefinition = "FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE CASCADE"))
     private Car car;

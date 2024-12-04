@@ -26,14 +26,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.security:spring-security-messaging'
-
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '3.3.5'
-
-
-
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
+bootJar {
+    archiveFileName = 'my-application.jar'
+    mainClass = 'com.example.backend.BackendApplication' // Убедитесь, что это правильный путь к вашему основному классу
+}
+
 
 tasks.named('test') {
     useJUnitPlatform()

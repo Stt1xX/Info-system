@@ -20,7 +20,7 @@ public class Commit {
     @Column(name = "item_id", nullable = false)
     private Integer itemId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "author_id",
             foreignKeyDefinition = "FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User author;

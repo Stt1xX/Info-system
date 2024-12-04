@@ -4,8 +4,8 @@ import {Stomp} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import {getUrlPrefix, ItemType} from "@/js/utils.js";
 
-const defObj = (page_size, obj) => ({
-    data: [obj],
+const defObj = (page_size) => ({
+    data: [],
     total_pages: 0,
     page_number: 0,
     size_number: page_size,
@@ -16,9 +16,9 @@ const defObj = (page_size, obj) => ({
 });
 
 export const objects = ref({
-    [ItemType.CAR] : defObj(8, {id : 5, author : 'author', name : 'Car1', cool : true}),
-    [ItemType.COORDINATES] : defObj(8, {id : 5, author : 'author', x : 123, y : 154}),
-    [ItemType.HUMAN] : defObj(8, {}),
+    [ItemType.CAR] : defObj(8),
+    [ItemType.COORDINATES] : defObj(8),
+    [ItemType.HUMAN] : defObj(8),
     [ItemType.CAR_HUMAN_SEARCH] : defObj(5),
     [ItemType.COORDINATES_HUMAN_SEARCH] : defObj(5),
 });
