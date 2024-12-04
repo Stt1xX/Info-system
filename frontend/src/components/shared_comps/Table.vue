@@ -25,7 +25,7 @@
       <component :is="item" v-for="obj in objects[itemType].data" :key="obj.id" :obj="obj"/>
     </div>
   </div>
-  <PaginationItems :itemType="itemType" class="mt-4"/>
+  <PaginationItems :itemType="itemType" class="mt-4  mb-[200px]"/>
 </template>
 
 <script setup>
