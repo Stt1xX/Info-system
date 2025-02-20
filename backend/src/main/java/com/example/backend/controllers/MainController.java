@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MainController {
 
     @GetMapping({"/login", "/registration", "/admin/messages",
-    "/humanTable", "/coordinateTable", "/carTable"})
+    "/humanTable", "/coordinateTable", "/carTable", "/importFile"})
     public String mainPage() {
         return "forward:/index.html";
     }

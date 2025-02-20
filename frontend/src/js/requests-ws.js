@@ -1,7 +1,7 @@
 import {ref} from "vue";
 
 import {Stomp} from "@stomp/stompjs";
-import SockJS from "sockjs-client";
+// import SockJS from "sockjs-client";
 
 export const messages = ref([]);
 

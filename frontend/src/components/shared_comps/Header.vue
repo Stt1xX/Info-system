@@ -9,6 +9,7 @@
       <HumanTableButton />
       <CarTableButton />
       <CoordinateTableButton />
+      <ImportFileButton />
       <RequestsButton v-if="admin_role" :is_admin="admin_role" />
       <LogoutButton @logout="intermediateEmit" :token="token" />
       <DeleteAccountButton @logout="intermediateEmit" :token="token" />
@@ -22,6 +23,7 @@ import LogoutButton from "@/components/buttons/LogoutButton.vue"
 import RequestsButton from "@/components/buttons/RequestsButton.vue"
 import CarTableButton from "@/components/buttons/CarTableButton.vue";
 import HumanTableButton from "@/components/buttons/HumanTableButton.vue";
+import ImportFileButton from "@/components/buttons/ImportFileButton.vue";
 import CoordinateTableButton from "@/components/buttons/CoordinateTableButton.vue";
 import GhostLogo from "@/components/logos/GhostLogo.vue";
 import {onMounted, ref} from "vue";
