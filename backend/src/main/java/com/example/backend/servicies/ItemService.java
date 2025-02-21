@@ -49,7 +49,6 @@ public abstract class ItemService<ClassDTO , MainClass> {
 
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> addAll(Map<Integer, ClassDTO> classDTOs);
 
     @Transactional(isolation = Isolation.SERIALIZABLE)

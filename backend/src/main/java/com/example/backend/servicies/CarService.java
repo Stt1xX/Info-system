@@ -12,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,11 +52,12 @@ public class CarService extends ItemService<CarDTO, Car> {
     @Override
     public ResponseEntity<?> addAll(Map<Integer, CarDTO> carDTOs) {
         Set<Car> cars = new HashSet<>(getAll());
+        List<Car> newCars = new ArrayList<>();
         String author = userService.getCurrentUser().getUsername();
         for (Map.Entry<Integer, CarDTO> carDTO : carDTOs.entrySet()) {
             ResponseEntity<?> resp = checker.validate(carDTO.getValue());
             if (resp.getStatusCode() != HttpStatus.OK) {
-                return new ResponseEntity<>("Cars: Line " + carDTO.getKey() + ": " + resp.getBody(), org.springframework.http.HttpStatus.BAD_REQUEST);
+                throw new DataIntegrityViolationException("Cars: Line " + carDTO.getKey() + ": " + resp.getBody());
             }
             Car car = new Car();
             car.setAuthor(author);
@@ -68,9 +66,10 @@ public class CarService extends ItemService<CarDTO, Car> {
             if (!cars.add(car)) {
                 throw new DataIntegrityViolationException("Cars: Line " + carDTO.getKey() + ": Error: Car with name " + car.getName() + " already exists");
             }
+            newCars.add(car);
         }
         try{
-            List<Car> savedCar = repository.saveAll(cars);
+            List<Car> savedCar = repository.saveAll(newCars);
             simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
             ResponseEntity<?> resp = auditService.doCommits(savedCar.stream().map(Car::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
             if (resp.getStatusCode() != HttpStatus.OK) {

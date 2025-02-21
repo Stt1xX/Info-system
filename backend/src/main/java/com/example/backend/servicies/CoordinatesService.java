@@ -1,7 +1,6 @@
 package com.example.backend.servicies;
 
 import com.example.backend.entities.Coordinates;
-import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
@@ -13,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,23 +50,23 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
     }
 
     @Override
-    public ResponseEntity<?> addAll(Map<Integer, CoordinatesDTO> coordinatesDTOs) {
-        Set<Coordinates> coordinatesSet = new HashSet<>(getAll());
+    public ResponseEntity<?> addAll(Map<Integer, CoordinatesDTO> coordinatesDTOs){
+        List<Coordinates> newCoordinates = new ArrayList<>();
         String author = userService.getCurrentUser().getUsername();
         for (Map.Entry<Integer, CoordinatesDTO> coordinatesDTO : coordinatesDTOs.entrySet()) {
             ResponseEntity<?> resp = checker.validate(coordinatesDTO.getValue());
             if (resp.getStatusCode() != HttpStatus.OK) {
-                return new ResponseEntity<>("Coordinates: Line " + coordinatesDTO.getKey() + ": " + resp.getBody(), org.springframework.http.HttpStatus.BAD_REQUEST);
+                throw new DataIntegrityViolationException("Coordinates: Line " + coordinatesDTO.getKey() + ": " + resp.getBody());
             }
             Coordinates coordinates = new Coordinates();
             coordinates.setX(coordinatesDTO.getValue().getX());
             coordinates.setY(coordinatesDTO.getValue().getY());
             coordinates.setAuthor(author);
-            coordinatesSet.add(coordinates);
+            newCoordinates.add(coordinates);
             // There aren't any unique fields
         }
         try{
-            List<Coordinates> savedCoordinates = repository.saveAll(coordinatesSet);
+            List<Coordinates> savedCoordinates = repository.saveAll(newCoordinates);
             simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
             ResponseEntity<?> resp = auditService.doCommits(savedCoordinates.stream().map(Coordinates::getId).collect(Collectors.toList()), EntityType.COORDINATES, "Create");
             if (resp.getStatusCode() != HttpStatus.OK) {
