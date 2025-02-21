@@ -11,7 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CarService extends ItemService<CarDTO, Car> {
@@ -45,6 +49,38 @@ public class CarService extends ItemService<CarDTO, Car> {
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
         }
+    }
+
+    @Override
+    public ResponseEntity<?> addAll(List<CarDTO> carDTOs) {
+        for (CarDTO carDTO : carDTOs) {
+            ResponseEntity<?> resp = checker.validate(carDTO);
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
+        }
+        Set<Car> cars = new HashSet<>(getAll());
+        String author = userService.getCurrentUser().getUsername();
+        for (CarDTO carDTO : carDTOs) {
+            Car car = new Car();
+            car.setAuthor(author);
+            car.setCool(carDTO.isCool());
+            car.setName(carDTO.getName());
+            if (!cars.add(car)) {
+                throw new DataIntegrityViolationException("Error: Car with name " + car.getName() + " already exists");
+            }
+        }
+        try{
+            List<Car> savedCar = repository.saveAll(cars);
+            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
+            ResponseEntity<?> resp = auditService.doCommits(savedCar.stream().map(Car::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>("Cars successfully added!", org.springframework.http.HttpStatus.OK);
     }
 
     @Override

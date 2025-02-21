@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "cars")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -57,5 +59,17 @@ public class Car extends ManagedEntity {
                 ", name='" + name + '\'' +
                 ", cool=" + cool +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return Objects.equals(name, car.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }

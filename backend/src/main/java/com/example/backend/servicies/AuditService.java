@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AuditService {
@@ -73,6 +75,29 @@ public class AuditService {
             commitRepository.save(commit);
             simpMessagingTemplate.convertAndSend("/topic/audit", "");
             return new ResponseEntity<>("Commit successfully added!", org.springframework.http.HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>("Error: Incorrect commit data", HttpStatus.CONFLICT);
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<?> doCommits(List<Integer> entityIds, EntityType entityType, String action){
+        List<Commit> commits = new ArrayList<>();
+        String author = userService.getCurrentUser().getUsername();
+        String date = Utils.prepareDate(Instant.now());
+        for (Integer entityId : entityIds) {
+            Commit commit = new Commit();
+            commit.setAuthor(author);
+            commit.setItemType(entityType);
+            commit.setItemId(entityId);
+            commit.setDate(date);
+            commit.setAction(action);
+            commits.add(commit);
+        }
+        try {
+            commitRepository.saveAll(commits);
+            simpMessagingTemplate.convertAndSend("/topic/audit", "");
+            return new ResponseEntity<>("Commits successfully added!", org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>("Error: Incorrect commit data", HttpStatus.CONFLICT);
         }

@@ -37,6 +37,8 @@
 <script setup>
 import { ref } from 'vue';
 import HistoryImportWindow from "@/components/windows/HistoryImportWindow.vue";
+import {token} from "@/js/csrf-token.js";
+import {showAlert} from "@/js/custom-alert.js";
 
 const file = ref(null);
 const fileInput = ref(null);
@@ -63,7 +65,26 @@ const handleSend = () => {
   if (!file.value) {
     showWarning.value = true;
   } else {
-    // Logic to handle file send
+    const formData = new FormData();
+    formData.append('file', file.value);
+    $.ajax({
+      url: '/files/import',
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      headers: {
+        'X-CSRF-Token': token.value
+      },
+      success: (data) => {
+        showAlert(data);
+      },
+      error: (error) => {
+        showAlert(error);
+      }
+    })
+    file.value = null;
+    fileInput.value.value = null;
   }
 };
 

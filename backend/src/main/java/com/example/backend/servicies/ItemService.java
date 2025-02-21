@@ -2,6 +2,7 @@ package com.example.backend.servicies;
 
 import com.example.backend.entities.DTO.PageRequestDTO;
 import com.example.backend.entities.DTO.PageResponseDTO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +48,9 @@ public abstract class ItemService<ClassDTO , MainClass> {
     }
 
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public abstract ResponseEntity<?> addAll(List<ClassDTO> classDTOs);
 
     public abstract ResponseEntity<?> update(Integer id, ClassDTO classDTO);
 

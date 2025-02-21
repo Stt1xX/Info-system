@@ -15,7 +15,7 @@ public class Specification {
                     return criteriaBuilder.disjunction();
                 }
             }
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get(varName)), "%" + template + "%");
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get(varName)), "%" + template.toLowerCase() + "%");
         };
     }
 }

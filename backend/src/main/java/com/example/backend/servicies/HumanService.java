@@ -59,9 +59,13 @@ public class HumanService extends ItemService<HumanDTO, Human> {
             }
             return new ResponseEntity<>(String.format("Human %s successfully added!", human.getName()), org.springframework.http.HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>("Error: Incorrect human's input data", HttpStatus.CONFLICT);
         }
+    }
+
+    @Override
+    public ResponseEntity<?> addAll(List<HumanDTO> classDTOs) {
+        return null;
     }
 
     @Override

@@ -48,6 +48,11 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
     }
 
     @Override
+    public ResponseEntity<?> addAll(List<CoordinatesDTO> classDTOs) {
+        return null;
+    }
+
+    @Override
     public ResponseEntity<?> update(Integer id, CoordinatesDTO coordinatesDTO) {
         ResponseEntity<?> resp = checker.validate(coordinatesDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {

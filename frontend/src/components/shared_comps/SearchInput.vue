@@ -49,6 +49,9 @@ const handleClickOutside = (event) => {
 };
 
 onMounted(() => {
+  objects.value[props.itemType].searchBy = 'id';
+  objects.value[props.itemType].searchTemplate = '';
+  get(props.itemType)
   document.addEventListener('click', handleClickOutside);
   $.ajax({
     type: 'GET',
@@ -67,9 +70,6 @@ const search = () => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
-  objects.value[props.itemType].searchBy = 'id';
-  objects.value[props.itemType].searchTemplate = '';
-  get(props.itemType)
 });
 </script>
 
