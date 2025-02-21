@@ -80,7 +80,7 @@ const handleSend = () => {
         showAlert(data);
       },
       error: (error) => {
-        showAlert(error);
+        showAlert(error.responseText);
       }
     })
     file.value = null;

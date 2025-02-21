@@ -50,8 +50,9 @@ public abstract class ItemService<ClassDTO , MainClass> {
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public abstract ResponseEntity<?> addAll(List<ClassDTO> classDTOs);
+    public abstract ResponseEntity<?> addAll(Map<Integer, ClassDTO> classDTOs);
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> update(Integer id, ClassDTO classDTO);
 
     public abstract ResponseEntity<?> delete(Integer id);

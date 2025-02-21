@@ -1,6 +1,7 @@
 package com.example.backend.servicies;
 
 import com.example.backend.entities.Coordinates;
+import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
@@ -11,7 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates> {
@@ -48,8 +54,32 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
     }
 
     @Override
-    public ResponseEntity<?> addAll(List<CoordinatesDTO> classDTOs) {
-        return null;
+    public ResponseEntity<?> addAll(Map<Integer, CoordinatesDTO> coordinatesDTOs) {
+        Set<Coordinates> coordinatesSet = new HashSet<>(getAll());
+        String author = userService.getCurrentUser().getUsername();
+        for (Map.Entry<Integer, CoordinatesDTO> coordinatesDTO : coordinatesDTOs.entrySet()) {
+            ResponseEntity<?> resp = checker.validate(coordinatesDTO.getValue());
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return new ResponseEntity<>("Coordinates: Line " + coordinatesDTO.getKey() + ": " + resp.getBody(), org.springframework.http.HttpStatus.BAD_REQUEST);
+            }
+            Coordinates coordinates = new Coordinates();
+            coordinates.setX(coordinatesDTO.getValue().getX());
+            coordinates.setY(coordinatesDTO.getValue().getY());
+            coordinates.setAuthor(author);
+            coordinatesSet.add(coordinates);
+            // There aren't any unique fields
+        }
+        try{
+            List<Coordinates> savedCoordinates = repository.saveAll(coordinatesSet);
+            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
+            ResponseEntity<?> resp = auditService.doCommits(savedCoordinates.stream().map(Coordinates::getId).collect(Collectors.toList()), EntityType.COORDINATES, "Create");
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return resp;
+            }
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>("Cars successfully added!", org.springframework.http.HttpStatus.OK);
     }
 
     @Override

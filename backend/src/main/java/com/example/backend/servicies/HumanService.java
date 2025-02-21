@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -64,7 +65,7 @@ public class HumanService extends ItemService<HumanDTO, Human> {
     }
 
     @Override
-    public ResponseEntity<?> addAll(List<HumanDTO> classDTOs) {
+    public ResponseEntity<?> addAll(Map<Integer, HumanDTO> classDTOs) {
         return null;
     }
 

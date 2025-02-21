@@ -1,6 +1,7 @@
 package com.example.backend.servicies;
 
 import com.example.backend.entities.DTO.CarDTO;
+import com.example.backend.entities.DTO.CoordinatesDTO;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FileService {
@@ -21,9 +24,11 @@ public class FileService {
     private static final String[] sheetNames = new String[]{"Cars", "Coordinates", "Humans"};
 
     private final CarService carService;
+    private final CoordinatesService coordinatesService;
 
-    public FileService(CarService carService) {
+    public FileService(CarService carService, CoordinatesService coordinatesService) {
         this.carService = carService;
+        this.coordinatesService = coordinatesService;
     }
 
     public ResponseEntity<?> importFile(MultipartFile file) {
@@ -33,27 +38,55 @@ public class FileService {
 
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
-            return carService.addAll(getCars(workbook));
-        }
-        catch (IOException e) {
-                return ResponseEntity.badRequest().body("Ошибка обработки файла: " + e.getMessage());
+            ResponseEntity<?> resp = carService.addAll(getCars(workbook));
+            if (resp.getStatusCode().isError()) {
+                return resp;
+            }
+            resp = coordinatesService.addAll(getCoordinates(workbook));
+            if (resp.getStatusCode().isError()) {
+                return resp;
+            }
+            return ResponseEntity.ok("The file has been processed successfully!");
+
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("File processing error");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body("Incorrect file format");
         }
     }
 
-    private List<CarDTO> getCars(Workbook workbook){
+    private Map<Integer, CarDTO> getCars(Workbook workbook) throws IllegalStateException {
         Sheet sheet = workbook.getSheet(sheetNames[0]);
         DataFormatter formatter = new DataFormatter();
         if (sheet == null) {
-            return new ArrayList<>();
+            return new HashMap<>();
         }
-        List<CarDTO> cars = new ArrayList<>();
+        Map<Integer, CarDTO> cars = new HashMap<>();
         for (Row row : sheet) {
             CarDTO car = new CarDTO();
+            if(row.getCell(1) == null){
+                continue;
+            }
             car.setName(formatter.formatCellValue(row.getCell(0)));
             car.setCool(row.getCell(1).getBooleanCellValue());
-            cars.add(car);
+            cars.put(row.getRowNum(), car);
         }
         return cars;
+    }
+
+    private Map<Integer, CoordinatesDTO> getCoordinates(Workbook workbook) throws IllegalStateException {
+        Sheet sheet = workbook.getSheet(sheetNames[1]);
+        if (sheet == null) {
+            return new HashMap<>();
+        }
+        Map<Integer, CoordinatesDTO> coordinates = new HashMap<>();
+        for (Row row : sheet) {
+            CoordinatesDTO coordinate = new CoordinatesDTO();
+            coordinate.setX((int) row.getCell(0).getNumericCellValue());
+            coordinate.setY((int) row.getCell(1).getNumericCellValue());
+            coordinates.put(row.getRowNum(), coordinate);
+        }
+        return coordinates;
     }
 
 }

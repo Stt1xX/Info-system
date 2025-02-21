@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,22 +53,20 @@ public class CarService extends ItemService<CarDTO, Car> {
     }
 
     @Override
-    public ResponseEntity<?> addAll(List<CarDTO> carDTOs) {
-        for (CarDTO carDTO : carDTOs) {
-            ResponseEntity<?> resp = checker.validate(carDTO);
-            if (resp.getStatusCode() != HttpStatus.OK) {
-                return resp;
-            }
-        }
+    public ResponseEntity<?> addAll(Map<Integer, CarDTO> carDTOs) {
         Set<Car> cars = new HashSet<>(getAll());
         String author = userService.getCurrentUser().getUsername();
-        for (CarDTO carDTO : carDTOs) {
+        for (Map.Entry<Integer, CarDTO> carDTO : carDTOs.entrySet()) {
+            ResponseEntity<?> resp = checker.validate(carDTO.getValue());
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                return new ResponseEntity<>("Cars: Line " + carDTO.getKey() + ": " + resp.getBody(), org.springframework.http.HttpStatus.BAD_REQUEST);
+            }
             Car car = new Car();
             car.setAuthor(author);
-            car.setCool(carDTO.isCool());
-            car.setName(carDTO.getName());
+            car.setCool(carDTO.getValue().isCool());
+            car.setName(carDTO.getValue().getName());
             if (!cars.add(car)) {
-                throw new DataIntegrityViolationException("Error: Car with name " + car.getName() + " already exists");
+                throw new DataIntegrityViolationException("Cars: Line " + carDTO.getKey() + ": Error: Car with name " + car.getName() + " already exists");
             }
         }
         try{
@@ -97,8 +96,12 @@ public class CarService extends ItemService<CarDTO, Car> {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
+        Set<Car> cars = new HashSet<>(getAll());
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
+        if (!cars.add(car)) {
+            throw new DataIntegrityViolationException("Error: Car with name " + car.getName() + " already exists");
+        }
         try{
             List<Human> depends = getDepends(id);
             Car updatedCar = repository.save(car);
