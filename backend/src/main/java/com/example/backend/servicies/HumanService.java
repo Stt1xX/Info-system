@@ -102,7 +102,7 @@ public class HumanService extends ItemService<HumanDTO, Human> {
                 human.setCoordinates(coordinates);
             }
             if (!humans.add(human)) {
-                throw new DataIntegrityViolationException("Humans: Line " + humanDTO.getKey() + ": Error: Car with name " + human.getName() + " already exists");
+                throw new DataIntegrityViolationException("Humans: Line " + humanDTO.getKey() + ": Error: Human with name " + human.getName() + " already exists");
             }
             newHumans.add(human);
         }

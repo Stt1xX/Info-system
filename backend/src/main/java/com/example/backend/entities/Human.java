@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "humans")
@@ -179,5 +180,17 @@ public class Human extends ManagedEntity {
 
     public void setWeaponType(WeaponType weaponType) {
         this.weaponType = weaponType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Human human = (Human) o;
+        return Objects.equals(name, human.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }
