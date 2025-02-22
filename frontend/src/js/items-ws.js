@@ -26,7 +26,6 @@ export const objects = ref({
 let stompClient= new Array(3); // HUMANS, CARS, COORDINATES
 
 export const connect = (itemType) => {
-    console.log(getUrlPrefix(itemType))
     stompClient[itemType] = Stomp.over(() => new SockJS('/ws'));
     stompClient[itemType].debug = function() {}
     stompClient[itemType].connect({}, () => {

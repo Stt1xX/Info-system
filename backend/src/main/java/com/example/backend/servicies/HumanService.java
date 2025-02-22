@@ -8,6 +8,7 @@ import com.example.backend.entities.DTO.HumanDTO;
 import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.HumanRepository;
+import com.example.backend.servicies.enums.CounterIndex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -68,13 +69,14 @@ public class HumanService extends ItemService<HumanDTO, Human> {
 
     @Override
     public ResponseEntity<?> addAll(Map<Integer, HumanDTO> humanDTOs) {
+        int[] ret_arr = new int[]{0, 0, 0};
         Set<Human> humans = new HashSet<>(getAll());
         List<Human> newHumans = new ArrayList<>();
         String author = userService.getCurrentUser().getUsername();
         for (Map.Entry<Integer, HumanDTO> humanDTO : humanDTOs.entrySet()) {
             ResponseEntity<?> resp = checker.validate(humanDTO.getValue());
             if (resp.getStatusCode() != HttpStatus.OK) {
-                throw new DataIntegrityViolationException("Humans: Line " + humanDTO.getKey() + ": " + resp.getBody());
+                return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": " + resp.getBody());
             }
             Human human = new Human();
             human.setAuthor(author);
@@ -83,10 +85,11 @@ public class HumanService extends ItemService<HumanDTO, Human> {
                 human.setCar(carService.getObjWhileAddFunc(
                         new CarDTO(humanDTO.getValue().getCarName(), humanDTO.getValue().getCarIsCool()
                 )));
+                ret_arr[CounterIndex.CAR.getValue()]++;
             } else {
                 Car car = carService.findById(humanDTO.getValue().getCarId());
                 if (car == null) {
-                    throw new DataIntegrityViolationException("Humans: Line " + humanDTO.getKey() + ": " + "Error: Car not found");
+                    return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": " + "Error: Car not found");
                 }
                 human.setCar(car);
             }
@@ -94,15 +97,16 @@ public class HumanService extends ItemService<HumanDTO, Human> {
                 human.setCoordinates(coordinatesService.getObjWhileAddFunc(
                         new CoordinatesDTO(humanDTO.getValue().getX(), humanDTO.getValue().getY()
                 )));
+                ret_arr[CounterIndex.COORDINATES.getValue()]++;
             } else {
                 Coordinates coordinates = coordinatesService.findById(humanDTO.getValue().getCoordinatesId());
                 if (coordinates == null) {
-                    throw new DataIntegrityViolationException("Humans: Line " + humanDTO.getKey() + ": " + "Error: Coordinates not found");
+                    return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": " + "Error: Coordinates not found");
                 }
                 human.setCoordinates(coordinates);
             }
             if (!humans.add(human)) {
-                throw new DataIntegrityViolationException("Humans: Line " + humanDTO.getKey() + ": Error: Human with name " + human.getName() + " already exists");
+                return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": Error: Human with name " + human.getName() + " already exists");
             }
             newHumans.add(human);
         }
@@ -110,9 +114,10 @@ public class HumanService extends ItemService<HumanDTO, Human> {
         simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
         ResponseEntity<?> resp = auditService.doCommits(savedHumans.stream().map(Human::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
         if (resp.getStatusCode() != HttpStatus.OK) {
-            return resp;
+            return ResponseEntity.badRequest().body((String) resp.getBody());
         }
-        return new ResponseEntity<>("Humans successfully added!", org.springframework.http.HttpStatus.OK);
+        ret_arr[CounterIndex.HUMAN.getValue()] = savedHumans.size();
+        return ResponseEntity.ok(ret_arr);
     }
 
     @Override

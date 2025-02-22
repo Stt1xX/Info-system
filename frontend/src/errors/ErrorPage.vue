@@ -24,7 +24,6 @@ const route = useRoute()
 const error_code = decodeURIComponent(route.query.message)
 const errorMessage = ref('An error occurred.')
 onMounted(() => {
-  console.log(route)
   switch (error_code){
     case '403':
       errorMessage.value = 'You do not have permission to view this page.'
@@ -33,7 +32,6 @@ onMounted(() => {
       errorMessage.value = 'Not found.'
       break
     default:
-      console.log('Error code:', error_code)
       errorMessage.value = 'An error occurred.'
   }
 })

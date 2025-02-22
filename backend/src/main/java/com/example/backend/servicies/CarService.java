@@ -6,6 +6,7 @@ import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.CarRepository;
 import com.example.backend.repositories.HumanRepository;
+import com.example.backend.servicies.enums.CounterIndex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -59,14 +60,14 @@ public class CarService extends ItemService<CarDTO, Car> {
         for (Map.Entry<Integer, CarDTO> carDTO : carDTOs.entrySet()) {
             ResponseEntity<?> resp = checker.validate(carDTO.getValue());
             if (resp.getStatusCode() != HttpStatus.OK) {
-                throw new DataIntegrityViolationException("Cars: Line " + carDTO.getKey() + ": " + resp.getBody());
+                return ResponseEntity.badRequest().body("Cars: Line " + carDTO.getKey() + ": " + resp.getBody());
             }
             Car car = new Car();
             car.setAuthor(author);
             car.setCool(carDTO.getValue().isCool());
             car.setName(carDTO.getValue().getName());
             if (!cars.add(car)) {
-                throw new DataIntegrityViolationException("Cars: Line " + carDTO.getKey() + ": Error: Car with name " + car.getName() + " already exists");
+                return ResponseEntity.badRequest().body("Cars: Line " + carDTO.getKey() + ": Error: Car with name " + car.getName() + " already exists");
             }
             newCars.add(car);
         }
@@ -74,9 +75,11 @@ public class CarService extends ItemService<CarDTO, Car> {
         simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
         ResponseEntity<?> resp = auditService.doCommits(savedCar.stream().map(Car::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
         if (resp.getStatusCode() != HttpStatus.OK) {
-            throw new DataIntegrityViolationException((String) resp.getBody());
+            return resp;
         }
-        return new ResponseEntity<>("Cars successfully added!", org.springframework.http.HttpStatus.OK);
+        int[] ret_arr = new int[]{0, 0, 0};
+        ret_arr[CounterIndex.CAR.getValue()] = savedCar.size();
+        return ResponseEntity.ok(ret_arr);
     }
 
     @Override

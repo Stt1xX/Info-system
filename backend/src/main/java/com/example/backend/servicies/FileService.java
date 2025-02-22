@@ -3,12 +3,16 @@ package com.example.backend.servicies;
 import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.DTO.HumanDTO;
+import com.example.backend.entities.ImportRecord;
+import com.example.backend.entities.enums.ImportStatus;
+import com.example.backend.servicies.enums.CounterIndex;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,11 +35,13 @@ public class FileService {
     private final CarService carService;
     private final CoordinatesService coordinatesService;
     private final HumanService humanService;
+    private final ImportRecordService importRecordService;
 
-    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService) {
+    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService) {
         this.carService = carService;
         this.coordinatesService = coordinatesService;
         this.humanService = humanService;
+        this.importRecordService = importRecordService;
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -60,18 +66,42 @@ public class FileService {
 
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
+            ImportRecord record = importRecordService.createRecord();
             ResponseEntity<?> resp = carService.addAll(getCars(workbook));
-            if (resp.getStatusCode().isError()) {
-                return resp;
+            int[] cars_num, coords_num, humans_num;
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                record.setStatus(ImportStatus.FAILED);
+                importRecordService.updateRecord(record);
+                throw new DataIntegrityViolationException((String)resp.getBody());
+            } else {
+                cars_num = (int[])resp.getBody();
             }
             resp = coordinatesService.addAll(getCoordinates(workbook));
-            if (resp.getStatusCode().isError()) {
-                return resp;
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                record.setStatus(ImportStatus.FAILED);
+                importRecordService.updateRecord(record);
+                throw new DataIntegrityViolationException((String)resp.getBody());
+            } else {
+                coords_num = (int[])resp.getBody();
             }
             resp = humanService.addAll(getHumans(workbook));
-            if (resp.getStatusCode().isError()) {
-                return resp;
+            if (resp.getStatusCode() != HttpStatus.OK) {
+                record.setStatus(ImportStatus.FAILED);
+                importRecordService.updateRecord(record);
+                throw new DataIntegrityViolationException((String)resp.getBody());
+            } else {
+                humans_num = (int[])resp.getBody();
             }
+            int humans_num_sum = humans_num != null ? humans_num[CounterIndex.HUMAN.getValue()] : 0,
+                cars_num_sum = (cars_num != null ? cars_num[CounterIndex.CAR.getValue()] : 0)
+                        + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
+                coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
+                        (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
+            record.setCompletedCars(cars_num_sum);
+            record.setCompletedCoordinates(coords_num_sum);
+            record.setCompletedHumans(humans_num_sum);
+            record.setStatus(ImportStatus.SUCCESS);
+            importRecordService.updateRecord(record);
             return ResponseEntity.ok("The file has been processed successfully!");
 
         } catch (IOException e) {
@@ -175,5 +205,4 @@ public class FileService {
         }
         return "";
     }
-
 }

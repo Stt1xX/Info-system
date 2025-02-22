@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import {pageNumber, get, totalPages} from "@/js/audit-ws.js";
+import {get, pageNumber, totalPages} from "@/js/import-history.js";
 import {ref} from "vue";
 
 const div = ref(null)
@@ -15,13 +15,13 @@ const div = ref(null)
 const prevPage = () => {
   if (pageNumber.value > 0) {
     pageNumber.value -= 1;
-    // get(props.id, props.itemCode);
+    get();
   }
 };
 
 const nextPage = () => {
   pageNumber.value += 1;
-  // get(props.id, props.itemCode);
+  get();
 };
 
 

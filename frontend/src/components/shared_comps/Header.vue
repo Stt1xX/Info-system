@@ -12,13 +12,13 @@
       <ImportFileButton />
       <RequestsButton v-if="admin_role" :is_admin="admin_role" />
       <LogoutButton @logout="intermediateEmit" :token="token" />
-      <DeleteAccountButton @logout="intermediateEmit" :token="token" />
+<!--      <DeleteAccountButton @logout="intermediateEmit" :token="token" />-->
+<!--      For simple database's links between user's id and commits and file imports entities-->
     </div>
   </header>
 </template>
 
 <script setup>
-import DeleteAccountButton from "@/components/buttons/DeleteAccountButton.vue"
 import LogoutButton from "@/components/buttons/LogoutButton.vue"
 import RequestsButton from "@/components/buttons/RequestsButton.vue"
 import CarTableButton from "@/components/buttons/CarTableButton.vue";
@@ -26,10 +26,8 @@ import HumanTableButton from "@/components/buttons/HumanTableButton.vue";
 import ImportFileButton from "@/components/buttons/ImportFileButton.vue";
 import CoordinateTableButton from "@/components/buttons/CoordinateTableButton.vue";
 import GhostLogo from "@/components/logos/GhostLogo.vue";
-import {onMounted, ref} from "vue";
-
-const username = ref()
-const admin_role = ref()
+import {onMounted} from "vue";
+import {get_user_info, admin_role, username} from "@/js/utils.js";
 
 const emit = defineEmits()
 
@@ -44,20 +42,6 @@ const props = defineProps({
 onMounted(() => {
   get_user_info()
 })
-
-function get_user_info() {
-  $.ajax({
-    type: 'GET',
-    url : '/users/get_user_info',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    success : (resp) => {
-      username.value = resp.username
-      admin_role.value = resp.admin_role
-    }
-  })
-}
 
 </script>
 

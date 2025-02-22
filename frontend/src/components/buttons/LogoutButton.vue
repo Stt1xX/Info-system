@@ -33,7 +33,11 @@ const logout = () => {
 </script>
 
 <style scoped>
-.logout-btn {
+
+/* .logout-btn {
   @apply flex items-center bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white font-bold py-2 px-4 rounded;
+} */
+.logout-btn {
+  @apply flex items-center bg-transparent hover:bg-red-500 text-red-500 hover:text-white font-bold py-2 px-4 rounded;
 }
 </style>

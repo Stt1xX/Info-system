@@ -25,7 +25,6 @@ export function get(id, itemCode) {
         url: `/${getUrlPrefix(itemCode)}/get_commits/${id}/${pageNumber.value}`,
         type: "GET",
         success: (response) => {
-            commits.value = response.content;
             totalPages.value = response.page.totalPages;
             pageNumber.value = response.page.number;
             if (totalPages.value <= pageNumber.value) {

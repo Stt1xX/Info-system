@@ -48,7 +48,6 @@ public class Checker {
                 return new ResponseEntity<>("Error: Human's car ID cannot be lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
             }
         }
-        System.out.println(humanDTO.getCoordinatesId());
         if (humanDTO.getCoordinatesId() != null && humanDTO.getCoordinatesId() < 0){
             return new ResponseEntity<>("Error: Human's coordinates ID cannot be lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
         }

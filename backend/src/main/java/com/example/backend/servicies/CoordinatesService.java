@@ -6,6 +6,7 @@ import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.CoordinatesRepository;
 import com.example.backend.repositories.HumanRepository;
+import com.example.backend.servicies.enums.CounterIndex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -59,14 +60,14 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
         for (Map.Entry<Integer, CoordinatesDTO> coordinatesDTO : coordinatesDTOs.entrySet()) {
             ResponseEntity<?> resp = checker.validate(coordinatesDTO.getValue());
             if (resp.getStatusCode() != HttpStatus.OK) {
-                throw new DataIntegrityViolationException("Coordinates: Line " + coordinatesDTO.getKey() + ": " + resp.getBody());
+                return ResponseEntity.badRequest().body("Coordinates: Line " + coordinatesDTO.getKey() + ": " + resp.getBody());
             }
             Coordinates coordinates = new Coordinates();
             coordinates.setX(coordinatesDTO.getValue().getX());
             coordinates.setY(coordinatesDTO.getValue().getY());
             coordinates.setAuthor(author);
             if (!mapCoordinates.add(coordinates)) {
-                throw new DataIntegrityViolationException("Coordinates: Line " + coordinatesDTO.getKey() + ": Error: Coordinates with X: " + coordinates.getX() + " and Y: " + coordinates.getY() + " already exists");
+                return ResponseEntity.badRequest().body("Coordinates: Line " + coordinatesDTO.getKey() + ": Error: Coordinates with X: " + coordinates.getX() + " and Y: " + coordinates.getY() + " already exists");
             }
             newCoordinates.add(coordinates);
         }
@@ -74,9 +75,11 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
         simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
         ResponseEntity<?> resp = auditService.doCommits(savedCoordinates.stream().map(Coordinates::getId).collect(Collectors.toList()), EntityType.COORDINATES, "Create");
         if (resp.getStatusCode() != HttpStatus.OK) {
-            throw new DataIntegrityViolationException((String) resp.getBody());
+            return ResponseEntity.badRequest().body(resp.getBody());
         }
-        return new ResponseEntity<>("Coordinates successfully added!", org.springframework.http.HttpStatus.OK);
+        int[] ret_arr = new int[]{0, 0, 0};
+        ret_arr[CounterIndex.COORDINATES.getValue()] = savedCoordinates.size();
+        return ResponseEntity.ok(ret_arr);
     }
 
     @Override

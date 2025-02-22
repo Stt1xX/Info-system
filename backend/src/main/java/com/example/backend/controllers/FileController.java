@@ -1,11 +1,9 @@
 package com.example.backend.controllers;
 
 import com.example.backend.servicies.FileService;
+import com.example.backend.servicies.ImportRecordService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -13,13 +11,20 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     private final FileService fileService;
+    private final ImportRecordService importRecordService;
 
-    public FileController(FileService fileService) {
+    public FileController(FileService fileService, ImportRecordService importRecordService) {
         this.fileService = fileService;
+        this.importRecordService = importRecordService;
     }
 
     @PostMapping("/import")
     public ResponseEntity<?> importFile(@RequestParam("file") MultipartFile file) {
         return fileService.mainImport(file);
+    }
+
+    @GetMapping("/history/{pageNumber}")
+    public ResponseEntity<?> getHistory(@PathVariable Integer pageNumber) {
+        return importRecordService.getHistory(pageNumber);
     }
 }
