@@ -20,6 +20,6 @@ public class FileController {
 
     @PostMapping("/import")
     public ResponseEntity<?> importFile(@RequestParam("file") MultipartFile file) {
-        return fileService.importFile(file);
+        return fileService.mainImport(file);
     }
 }

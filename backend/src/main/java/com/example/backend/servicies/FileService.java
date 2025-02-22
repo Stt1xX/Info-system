@@ -15,13 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class FileService {
 
     private static final String[] sheetNames = new String[]{"Cars", "Coordinates", "Humans"};
+    private static final List<String> ArchiveExtensions = List.of("zip", "rar", "7z");
+    private static final List<String> fileExtensions = List.of("xlsx");
 
     private final CarService carService;
     private final CoordinatesService coordinatesService;
@@ -32,7 +36,21 @@ public class FileService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public ResponseEntity<?> importFile(MultipartFile file) {
+    public ResponseEntity<?> mainImport(MultipartFile file){
+        if (ArchiveExtensions.contains(getFileExtension(file))) {
+            return importArchive(file);
+        } else if (fileExtensions.contains(getFileExtension(file))) {
+            return importFile(file);
+        } else {
+            return ResponseEntity.badRequest().body("Incorrect file format");
+        }
+    }
+
+    protected ResponseEntity<?> importArchive(MultipartFile file) {
+        return ResponseEntity.ok("It's Archive");
+    }
+
+    protected ResponseEntity<?> importFile(MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty!");
         }
@@ -88,6 +106,14 @@ public class FileService {
             coordinates.put(row.getRowNum(), coordinate);
         }
         return coordinates;
+    }
+
+    private static String getFileExtension(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        }
+        return "";
     }
 
 }
