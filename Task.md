@@ -14,7 +14,7 @@ public class HumanBeing {
     private Mood mood; //Поле может быть null
     private Integer impactSpeed; //Максимальное значение поля: 768, Поле не может быть null
     private String soundtrackName; //Поле не может быть null
-    private long minutesOfWaiting;
+    private long minutesOfWaiting; //Поле не может быть null
     private WeaponType weaponType; //Поле не может быть null
 }
 public class Coordinates {
