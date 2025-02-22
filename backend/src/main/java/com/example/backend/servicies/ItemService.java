@@ -2,6 +2,7 @@ package com.example.backend.servicies;
 
 import com.example.backend.entities.DTO.PageRequestDTO;
 import com.example.backend.entities.DTO.PageResponseDTO;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Isolation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.example.backend.repositories.DunamicQuery.Specification.hasNameContaining;
 
@@ -47,8 +49,10 @@ public abstract class ItemService<ClassDTO , MainClass> {
         this.mainClassType = mainClassType;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
 
+    // Also Serializable but Annotation set on mainImport method in FileService
     public abstract ResponseEntity<?> addAll(Map<Integer, ClassDTO> classDTOs);
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -79,10 +83,24 @@ public abstract class ItemService<ClassDTO , MainClass> {
         return repository.findAll();
     }
 
+    public MainClass findById(Integer id){
+        return repository.findById(id).orElse(null);
+    }
+
     protected Map<String, String> getSocketMessage(){
         Map<String, String> response = new HashMap<>();
         response.put("user_id", userService.getCurrentUser().getId().toString());
         response.put("signal", "update");
         return response;
+    }
+
+    @SuppressWarnings("SpringTransactionalMethodCallsInspection")
+    public MainClass getObjWhileAddFunc(ClassDTO DTO) {
+        ResponseEntity<?> resp = add(DTO);
+        if (resp.getStatusCode() == HttpStatus.OK) {
+            return (MainClass)(((List<Object>)(Objects.requireNonNull(resp.getBody()))).get(1));
+        } else {
+            throw new DataIntegrityViolationException((String) resp.getBody());
+        }
     }
 }

@@ -4,7 +4,6 @@ import com.example.backend.entities.Anntotations.SearchableField;
 import com.example.backend.entities.Anntotations.SortableField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Objects;
 
@@ -12,9 +11,10 @@ import java.util.Objects;
 @Table(name = "cars")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Car extends ManagedEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ColumnDefault("nextval('car_id_seq')")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq_gen")
+    @SequenceGenerator(name = "car_seq_gen", sequenceName = "car_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     @SortableField(name = "id")
     @SearchableField(name = "id")

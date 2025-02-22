@@ -5,6 +5,7 @@ import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.CarRepository;
+import com.example.backend.repositories.HumanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,35 +19,36 @@ import java.util.stream.Collectors;
 @Service
 public class CarService extends ItemService<CarDTO, Car> {
 
-    private final HumanService humanService;
+    private final HumanRepository humanRepository;
 
     @Autowired
-    public CarService(CarRepository carRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanService humanService) {
+    public CarService(CarRepository carRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanRepository humanRepository) {
         super(carRepository, userService, auditService, simpMessagingTemplate, checker, Car.class);
-        this.humanService = humanService;
+        this.humanRepository = humanRepository;
     }
 
     @Override
     public ResponseEntity<?> add(CarDTO carDTO) {
         ResponseEntity<?> resp = checker.validate(carDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
-            return resp;
+            throw new DataIntegrityViolationException((String) resp.getBody());
         }
+        getAll().forEach(car -> {
+            if (car.getName().equals(carDTO.getName())) {
+                throw new DataIntegrityViolationException("Error: Car with name " + carDTO.getName() + " already exists");
+            }
+        });
         Car car = new Car();
         car.setAuthor(userService.getCurrentUser().getUsername());
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
-        try{
-            Car savedCar = repository.save(car);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
-            resp = auditService.doCommit(savedCar.getId(), EntityType.CAR, "Create");
-            if (resp.getStatusCode() != HttpStatus.OK) {
-                return resp;
-            }
-            return new ResponseEntity<>(String.format("Car %s successfully added!", car.getName()), org.springframework.http.HttpStatus.OK);
-        } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
+        Car savedCar = repository.save(car);
+        simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
+        resp = auditService.doCommit(savedCar.getId(), EntityType.CAR, "Create");
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            throw new DataIntegrityViolationException((String) resp.getBody());
         }
+        return new ResponseEntity<>(List.of(String.format("Car %s successfully added!", car.getName()), savedCar), org.springframework.http.HttpStatus.OK);
     }
 
     @Override
@@ -68,15 +70,11 @@ public class CarService extends ItemService<CarDTO, Car> {
             }
             newCars.add(car);
         }
-        try{
-            List<Car> savedCar = repository.saveAll(newCars);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
-            ResponseEntity<?> resp = auditService.doCommits(savedCar.stream().map(Car::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
-            if (resp.getStatusCode() != HttpStatus.OK) {
-                return resp;
-            }
-        } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
+        List<Car> savedCar = repository.saveAll(newCars);
+        simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
+        ResponseEntity<?> resp = auditService.doCommits(savedCar.stream().map(Car::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            throw new DataIntegrityViolationException((String) resp.getBody());
         }
         return new ResponseEntity<>("Cars successfully added!", org.springframework.http.HttpStatus.OK);
     }
@@ -141,7 +139,7 @@ public class CarService extends ItemService<CarDTO, Car> {
     }
 
     public List<Human> getDepends(Integer id) {
-        return humanService.findByCarId(id);
+        return humanRepository.findAllByCar_Id(id);
     }
 
     public Car findByName(String name) {

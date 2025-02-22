@@ -39,13 +39,18 @@ public class Checker {
                 humanDTO.getName().isEmpty()){
             return new ResponseEntity<>("Error: Human's name cannot be empty", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
-            if (humanDTO.getCarId() == null ||
-                humanDTO.getCarId() < 0){
-            return new ResponseEntity<>("Error: Human's car ID cannot be empty or lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
+        if (humanDTO.getCarId() == null){
+            if (humanDTO.getCarName() == null){
+                return new ResponseEntity<>("Error: Human's car ID or name cannot be empty", org.springframework.http.HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            if (humanDTO.getCarId() < 0){
+                return new ResponseEntity<>("Error: Human's car ID cannot be lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
+            }
         }
-        if (humanDTO.getCoordinatesId() == null ||
-                humanDTO.getCoordinatesId() < 0){
-            return new ResponseEntity<>("Error: Human's coordinates ID cannot be empty or lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
+        System.out.println(humanDTO.getCoordinatesId());
+        if (humanDTO.getCoordinatesId() != null && humanDTO.getCoordinatesId() < 0){
+            return new ResponseEntity<>("Error: Human's coordinates ID cannot be lower than 0", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
         if (humanDTO.getMood() == null){
             return new ResponseEntity<>("Error: Human's mood cannot be empty", org.springframework.http.HttpStatus.BAD_REQUEST);

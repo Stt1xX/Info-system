@@ -9,13 +9,17 @@ public class HumanDTO {
     private String name;
     private Integer coordinatesId;
     private Integer carId;
-    private Boolean realHero;
-    private Boolean hasToothpick;
+    private boolean realHero;
+    private boolean hasToothpick;
     private Mood mood;
     private Integer impactSpeed;
     private String soundtrackName;
     private Long minutesOfWaiting;
     private WeaponType weaponType;
+    private String carName;
+    private boolean carIsCool;
+    private double x;
+    private float y;
 
     public static void setHuman(Human human, HumanDTO humanDTO) {
         human.setName(humanDTO.getName());
@@ -122,5 +126,57 @@ public class HumanDTO {
 
     public void setMinutesOfWaiting(Long minutesOfWaiting) {
         this.minutesOfWaiting = minutesOfWaiting;
+    }
+
+    public String getCarName() {
+        return carName;
+    }
+
+    public void setCarName(String carName) {
+        this.carName = carName;
+    }
+
+    public Boolean getCarIsCool() {
+        return carIsCool;
+    }
+
+    public void setCarIsCool(Boolean carIsCool) {
+        this.carIsCool = carIsCool;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    @Override
+    public String toString() {
+        return "HumanDTO{" +
+                "name='" + name + '\'' +
+                ", coordinatesId=" + coordinatesId +
+                ", carId=" + carId +
+                ", realHero=" + realHero +
+                ", hasToothpick=" + hasToothpick +
+                ", mood=" + mood +
+                ", impactSpeed=" + impactSpeed +
+                ", soundtrackName='" + soundtrackName + '\'' +
+                ", minutesOfWaiting=" + minutesOfWaiting +
+                ", weaponType=" + weaponType +
+                ", carName='" + carName + '\'' +
+                ", carIsCool=" + carIsCool +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
     }
 }

@@ -5,6 +5,7 @@ import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
 import com.example.backend.repositories.CoordinatesRepository;
+import com.example.backend.repositories.HumanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,40 +19,42 @@ import java.util.stream.Collectors;
 @Service
 public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates> {
 
-    private final HumanService humanService;
+    private final HumanRepository humanRepository;
 
     @Autowired
-    public CoordinatesService(CoordinatesRepository coordinatesRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanService humanService) {
+    public CoordinatesService(CoordinatesRepository coordinatesRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, HumanRepository humanRepository) {
         super(coordinatesRepository, userService, auditService, simpMessagingTemplate, checker, Coordinates.class);
-        this.humanService = humanService;
+        this.humanRepository = humanRepository;
     }
 
     @Override
     public ResponseEntity<?> add(CoordinatesDTO coordinatesDTO) {
         ResponseEntity<?> resp = checker.validate(coordinatesDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
-            return resp;
+            throw new DataIntegrityViolationException((String) resp.getBody());
         }
+        getAll().forEach(coordinates -> {
+            if (coordinates.getX().equals(coordinatesDTO.getX()) && coordinates.getY().equals(coordinatesDTO.getY())) {
+                throw new DataIntegrityViolationException("Error: Coordinates with X: " + coordinatesDTO.getX() + " and Y: " + coordinatesDTO.getY() + " already exists");
+            }
+        });
         Coordinates coordinates = new Coordinates();
         coordinates.setAuthor(userService.getCurrentUser().getUsername());
         coordinates.setX(coordinatesDTO.getX());
         coordinates.setY(coordinatesDTO.getY());
-        try{
-            Coordinates savedCoordinates = repository.save(coordinates);
-            simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
-            resp = auditService.doCommit(savedCoordinates.getId(), EntityType.COORDINATES, "Create");
-            if (resp.getStatusCode() != HttpStatus.OK) {
-                return resp;
-            }
-            return new ResponseEntity<>("Coordinates successfully added!", org.springframework.http.HttpStatus.OK);
-        } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Error: Incorrect coordinate's input data", HttpStatus.CONFLICT);
+        Coordinates savedCoordinates = repository.save(coordinates);
+        simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
+        resp = auditService.doCommit(savedCoordinates.getId(), EntityType.COORDINATES, "Create");
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return resp;
         }
+        return new ResponseEntity<>(List.of("Coordinates successfully added!", savedCoordinates), org.springframework.http.HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<?> addAll(Map<Integer, CoordinatesDTO> coordinatesDTOs){
         List<Coordinates> newCoordinates = new ArrayList<>();
+        Set<Coordinates> mapCoordinates = new HashSet<>(getAll());
         String author = userService.getCurrentUser().getUsername();
         for (Map.Entry<Integer, CoordinatesDTO> coordinatesDTO : coordinatesDTOs.entrySet()) {
             ResponseEntity<?> resp = checker.validate(coordinatesDTO.getValue());
@@ -62,20 +65,18 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
             coordinates.setX(coordinatesDTO.getValue().getX());
             coordinates.setY(coordinatesDTO.getValue().getY());
             coordinates.setAuthor(author);
-            newCoordinates.add(coordinates);
-            // There aren't any unique fields
-        }
-        try{
-            List<Coordinates> savedCoordinates = repository.saveAll(newCoordinates);
-            simpMessagingTemplate.convertAndSend("/topic/cars", getSocketMessage());
-            ResponseEntity<?> resp = auditService.doCommits(savedCoordinates.stream().map(Coordinates::getId).collect(Collectors.toList()), EntityType.COORDINATES, "Create");
-            if (resp.getStatusCode() != HttpStatus.OK) {
-                return resp;
+            if (!mapCoordinates.add(coordinates)) {
+                throw new DataIntegrityViolationException("Coordinates: Line " + coordinatesDTO.getKey() + ": Error: Coordinates with X: " + coordinates.getX() + " and Y: " + coordinates.getY() + " already exists");
             }
-        } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>("Error: Incorrect car's input data", HttpStatus.CONFLICT);
+            newCoordinates.add(coordinates);
         }
-        return new ResponseEntity<>("Cars successfully added!", org.springframework.http.HttpStatus.OK);
+        List<Coordinates> savedCoordinates = repository.saveAll(newCoordinates);
+        simpMessagingTemplate.convertAndSend("/topic/coordinates", getSocketMessage());
+        ResponseEntity<?> resp = auditService.doCommits(savedCoordinates.stream().map(Coordinates::getId).collect(Collectors.toList()), EntityType.COORDINATES, "Create");
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            throw new DataIntegrityViolationException((String) resp.getBody());
+        }
+        return new ResponseEntity<>("Coordinates successfully added!", org.springframework.http.HttpStatus.OK);
     }
 
     @Override
@@ -135,6 +136,6 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
     }
 
     public List<Human> getDepends(Integer id) {
-        return humanService.findByCoordinatesId(id);
+        return humanRepository.findAllByCoordinates_Id(id);
     }
 }

@@ -15,6 +15,11 @@ public class CarDTO {
 
     }
 
+    public CarDTO(String name, boolean cool) {
+        this.name = name;
+        this.cool = cool;
+    }
+
     public String getName() {
         return name;
     }

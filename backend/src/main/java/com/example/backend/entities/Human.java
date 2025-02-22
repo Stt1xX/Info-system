@@ -13,8 +13,8 @@ import java.time.Instant;
 @Table(name = "humans")
 public class Human extends ManagedEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ColumnDefault("nextval('humans_id_seq')")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "humans_seq_gen")
+    @SequenceGenerator(name = "humans_seq_gen", sequenceName = "humans_id_seq", allocationSize = 1)
     @Column(name = "human_id", nullable = false)
     @SortableField(name = "id")
     @SearchableField(name = "id")
