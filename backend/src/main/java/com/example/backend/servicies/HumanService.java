@@ -112,7 +112,7 @@ public class HumanService extends ItemService<HumanDTO, Human> {
         }
         List<Human> savedHumans = repository.saveAll(newHumans);
         simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
-        ResponseEntity<?> resp = auditService.doCommits(savedHumans.stream().map(Human::getId).collect(Collectors.toList()), EntityType.CAR, "Create");
+        ResponseEntity<?> resp = auditService.doCommits(savedHumans.stream().map(Human::getId).collect(Collectors.toList()), EntityType.HUMAN, "Create");
         if (resp.getStatusCode() != HttpStatus.OK) {
             return ResponseEntity.badRequest().body((String) resp.getBody());
         }
@@ -134,6 +134,12 @@ public class HumanService extends ItemService<HumanDTO, Human> {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
+
+        getAll().stream().filter(_human -> !Objects.equals(_human.getName(), human.getName())).forEach(_human -> {
+            if (_human.getName().equals(humanDTO.getName())) {
+                throw new DataIntegrityViolationException("Error: Human with name " + humanDTO.getName() + " already exists");
+            }
+        });
         try {
             HumanDTO.setHuman(human, humanDTO);
             Car car = carService.findById(humanDTO.getCarId());

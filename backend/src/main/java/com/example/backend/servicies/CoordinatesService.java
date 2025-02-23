@@ -1,5 +1,6 @@
 package com.example.backend.servicies;
 
+import com.example.backend.entities.Car;
 import com.example.backend.entities.Coordinates;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.Human;
@@ -96,9 +97,14 @@ public class CoordinatesService extends ItemService<CoordinatesDTO, Coordinates>
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
+        Set<Coordinates> coordinatesSet = new HashSet<>(getAll());
+        coordinatesSet.remove(coordinates);
         coordinates.setAuthor(userService.getCurrentUser().getUsername());
         coordinates.setX(coordinatesDTO.getX());
         coordinates.setY(coordinatesDTO.getY());
+        if (!coordinatesSet.add(coordinates)) {
+            return ResponseEntity.badRequest().body("Error: Coordinates with X: " + coordinates.getX() + " and Y: " + coordinates.getY() + " already exists");
+        }
         try{
             List<Human> depends = getDepends(id);
             Coordinates updatedCoordinates = repository.save(coordinates);

@@ -97,6 +97,7 @@ public class CarService extends ItemService<CarDTO, Car> {
             return resp;
         }
         Set<Car> cars = new HashSet<>(getAll());
+        cars.remove(car);
         car.setCool(carDTO.isCool());
         car.setName(carDTO.getName());
         if (!cars.add(car)) {
