@@ -1,6 +1,5 @@
 package com.example.backend.servicies;
 
-import com.example.backend.entities.Car;
 import com.example.backend.entities.Coordinates;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.Human;

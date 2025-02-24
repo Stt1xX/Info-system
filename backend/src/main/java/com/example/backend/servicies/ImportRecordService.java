@@ -40,7 +40,6 @@ public class ImportRecordService {
             page = importRecordRepository.findAll(pageable);
         } else {
             page = importRecordRepository.findByAuthor_Id(user.getId(), pageable);
-            System.out.println("Lot");
         }
         return ResponseEntity.ok(
                 new PageResponseDTO<>(page.getContent()
@@ -56,15 +55,21 @@ public class ImportRecordService {
                         new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements())));
     }
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ImportRecord createRecord() {
+    public void createFailedRecord() {
         ImportRecord importRecord = new ImportRecord();
-        importRecord.setStatus(ImportStatus.IN_PROGRESS);
+        importRecord.setStatus(ImportStatus.FAILED);
         importRecord.setAuthor(userService.getCurrentUser());
-        return importRecordRepository.save(importRecord);
+        importRecordRepository.save(importRecord);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateRecord(ImportRecord importRecord) {
+    public void createSuccessRecord(int cars, int humans, int coordinates) {
+        ImportRecord importRecord = new ImportRecord();
+        importRecord.setStatus(ImportStatus.SUCCESS);
+        importRecord.setAuthor(userService.getCurrentUser());
+        importRecord.setCompletedCars(cars);
+        importRecord.setCompletedHumans(humans);
+        importRecord.setCompletedCoordinates(coordinates);
         importRecordRepository.save(importRecord);
     }
 }

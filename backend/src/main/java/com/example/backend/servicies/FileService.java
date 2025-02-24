@@ -3,27 +3,35 @@ package com.example.backend.servicies;
 import com.example.backend.entities.DTO.CarDTO;
 import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.DTO.HumanDTO;
-import com.example.backend.entities.ImportRecord;
-import com.example.backend.entities.enums.ImportStatus;
 import com.example.backend.servicies.enums.CounterIndex;
+import com.example.backend.utils.ArchiveProcessor;
+import com.github.junrar.exception.RarException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 public class FileService {
@@ -37,6 +45,10 @@ public class FileService {
     private final HumanService humanService;
     private final ImportRecordService importRecordService;
 
+    @Lazy
+    @Autowired
+    private FileService self;
+
     public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService) {
         this.carService = carService;
         this.coordinatesService = coordinatesService;
@@ -44,50 +56,83 @@ public class FileService {
         this.importRecordService = importRecordService;
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public ResponseEntity<?> mainImport(MultipartFile file){
+    public ResponseEntity<?> mainImport(MultipartFile file) throws IOException {
+        File temp_file = convertMultipartFileToFile(file);
+        ResponseEntity<?> resp;
         if (ArchiveExtensions.contains(getFileExtension(file))) {
-            return importArchive(file);
+            resp = importArchive(temp_file);
         } else if (fileExtensions.contains(getFileExtension(file))) {
-            return importFile(file);
+            resp = self.importFile(temp_file);
         } else {
             return ResponseEntity.badRequest().body("Incorrect file's extension");
         }
+        //noinspection ResultOfMethodCallIgnored
+        temp_file.delete();
+        return resp;
     }
 
-    private ResponseEntity<?> importArchive(MultipartFile file) {
-        return ResponseEntity.ok("It's Archive");
-    }
 
-    private ResponseEntity<?> importFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is empty!");
+    public ResponseEntity<?> importArchive(File archiveFile) {
+
+        List<File> extractedFiles;
+        try {
+             extractedFiles = ArchiveProcessor.extractFiles(archiveFile);
+        } catch (IOException | RarException e) {
+            return ResponseEntity.badRequest().body("Error during archive parsing");
+        }
+        int MAX_FILES_ARCHIVE = 30;
+        if (extractedFiles.size() > MAX_FILES_ARCHIVE) {
+            return ResponseEntity.badRequest().body("Too many files in archive");
+        }
+        ExecutorService executor = Executors.newFixedThreadPool(ArchiveProcessor.THREAD_POOL_SIZE);
+        List<Future<ResponseEntity<?>>> futures = new ArrayList<>();
+
+        for (File file : extractedFiles) {
+            futures.add(executor.submit(() -> self.importFile(file)));
         }
 
-        try (InputStream inputStream = file.getInputStream();
+        int successFiles = 0;
+        for (Future<ResponseEntity<?>> future : futures) {
+            try {
+                if (future.get().getStatusCode() == HttpStatus.OK) {
+                    successFiles++;
+                }
+            } catch (InterruptedException | ExecutionException e){
+                // ignoring
+            }
+        }
+        executor.shutdown();
+
+        return ResponseEntity.ok("Processed " + successFiles + " files from archive");
+    }
+
+    @Retryable(value = CannotAcquireLockException.class, maxAttempts = ArchiveProcessor.THREAD_POOL_SIZE)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public ResponseEntity<?> importFile(File file) {
+
+        if (file == null || !file.exists() || file.length() == 0) {
+            return ResponseEntity.badRequest().body("File is empty or does not exist!");
+        }
+        try (InputStream inputStream = new FileInputStream(file);
              Workbook workbook = new XSSFWorkbook(inputStream)) {
-            ImportRecord record = importRecordService.createRecord();
             ResponseEntity<?> resp = carService.addAll(getCars(workbook));
             int[] cars_num, coords_num, humans_num;
             if (resp.getStatusCode() != HttpStatus.OK) {
-                record.setStatus(ImportStatus.FAILED);
-                importRecordService.updateRecord(record);
+                importRecordService.createFailedRecord();
                 throw new DataIntegrityViolationException((String)resp.getBody());
             } else {
                 cars_num = (int[])resp.getBody();
             }
             resp = coordinatesService.addAll(getCoordinates(workbook));
             if (resp.getStatusCode() != HttpStatus.OK) {
-                record.setStatus(ImportStatus.FAILED);
-                importRecordService.updateRecord(record);
+                importRecordService.createFailedRecord();
                 throw new DataIntegrityViolationException((String)resp.getBody());
             } else {
                 coords_num = (int[])resp.getBody();
             }
             resp = humanService.addAll(getHumans(workbook));
             if (resp.getStatusCode() != HttpStatus.OK) {
-                record.setStatus(ImportStatus.FAILED);
-                importRecordService.updateRecord(record);
+                importRecordService.createFailedRecord();
                 throw new DataIntegrityViolationException((String)resp.getBody());
             } else {
                 humans_num = (int[])resp.getBody();
@@ -97,16 +142,16 @@ public class FileService {
                         + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
                 coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
                         (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
-            record.setCompletedCars(cars_num_sum);
-            record.setCompletedCoordinates(coords_num_sum);
-            record.setCompletedHumans(humans_num_sum);
-            record.setStatus(ImportStatus.SUCCESS);
-            importRecordService.updateRecord(record);
+            importRecordService.createSuccessRecord(cars_num_sum, humans_num_sum, coords_num_sum);
             return ResponseEntity.ok("The file has been processed successfully!");
 
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("File processing error");
         }
+
+//        catch (CannotAcquireLockException e) {
+//            return ResponseEntity.badRequest().body("File processing error");
+//        }
     }
 
     private Map<Integer, CarDTO> getCars(Workbook workbook) throws IllegalStateException {
@@ -204,5 +249,13 @@ public class FileService {
             return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         }
         return "";
+    }
+
+    private static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
+        File file = File.createTempFile("upload_", "_" + multipartFile.getOriginalFilename());
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(multipartFile.getBytes());
+        }
+        return file;
     }
 }

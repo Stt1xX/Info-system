@@ -80,7 +80,7 @@ public class AuditService {
         }
     }
 
-    @Transactional
+
     public ResponseEntity<?> doCommits(List<Integer> entityIds, EntityType entityType, String action){
         List<Commit> commits = new ArrayList<>();
         String author = userService.getCurrentUser().getUsername();
