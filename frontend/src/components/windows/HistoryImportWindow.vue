@@ -2,7 +2,7 @@
   <div class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-40 text-white">
     <h1 class="text-2xl font-bold mb-6 text-center">History</h1>
     <div class="bg-gray-800 p-4 rounded-lg shadow-lg w-[560px] flex flex-col justify-between min-h-[615.2px]">
-      <ul class="list-none p-0 rounded-lg border border-gray-600">
+      <ul v-if="imports.length > 0" class="list-none p-0 rounded-lg border border-gray-600">
         <li
             v-for="_import in imports"
             :key="_import.id"
@@ -32,6 +32,9 @@
           </div>
         </li>
       </ul>
+      <div v-if="imports.length === 0" class="flex items-center justify-center h-full min-h-[200px] text-gray-400">
+        It's quiet here so far...
+      </div>
       <div class="flex justify-between items-center mt-6">
         <PaginationImportHistory/>
         <button @click="closeWindow" type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
