@@ -211,6 +211,7 @@ public class FileService {
         }
         Map<Integer, HumanDTO> humans = new HashMap<>();
         for (Row row : sheet) {
+            try {
             HumanDTO human = new HumanDTO();
             human.setName(row.getCell(0).getStringCellValue());
             human.setSoundtrackName(row.getCell(1).getStringCellValue());
@@ -239,6 +240,13 @@ public class FileService {
                 human.setY((float) row.getCell(13).getNumericCellValue());
             }
             humans.put(row.getRowNum(), human);
+            } catch (IllegalStateException e) {
+                throw new DataIntegrityViolationException("Incorrect file format: Humans: Line " +
+                        (row.getRowNum() + 1) + ": " + e.getMessage());
+            } catch (NullPointerException e) {
+                throw new DataIntegrityViolationException("Incorrect file format: Humans: Line " +
+                        (row.getRowNum() + 1) + ": " + "Fields can't be empty");
+            }
         }
         return humans;
     }

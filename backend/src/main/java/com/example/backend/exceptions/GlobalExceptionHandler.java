@@ -1,6 +1,8 @@
 package com.example.backend.exceptions;
 
+import org.hibernate.StaleObjectStateException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -29,5 +31,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> handleMaxUploadSizeExceededException() {
         return new ResponseEntity<>("File is too large", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ OptimisticLockingFailureException.class, StaleObjectStateException.class })
+    public ResponseEntity<String> handleOptimisticLocking(Exception e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Entity was modified or deleted by another transaction.");
     }
 }

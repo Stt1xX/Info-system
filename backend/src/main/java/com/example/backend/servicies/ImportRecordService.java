@@ -54,6 +54,7 @@ public class ImportRecordService {
                         .toList(),
                         new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements())));
     }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createFailedRecord() {
         ImportRecord importRecord = new ImportRecord();

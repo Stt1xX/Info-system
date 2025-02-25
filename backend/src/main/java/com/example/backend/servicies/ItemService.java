@@ -2,7 +2,10 @@ package com.example.backend.servicies;
 
 import com.example.backend.entities.DTO.PageRequestDTO;
 import com.example.backend.entities.DTO.PageResponseDTO;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -46,15 +49,18 @@ public abstract class ItemService<ClassDTO , MainClass> {
         this.mainClassType = mainClassType;
     }
 
+    @Retryable(value = CannotAcquireLockException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
 
     // Also Serializable but Annotation set on mainImport method in FileService
     public abstract ResponseEntity<?> addAll(Map<Integer, ClassDTO> classDTOs);
 
+    @Retryable(value = CannotAcquireLockException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> update(Integer id, ClassDTO classDTO);
 
+    @Transactional
     public abstract ResponseEntity<?> delete(Integer id);
 
     public ResponseEntity<?> getCommits(Integer id, Integer pageNumber){
