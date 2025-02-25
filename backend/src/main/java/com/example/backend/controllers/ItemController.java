@@ -7,10 +7,12 @@ import com.example.backend.entities.DTO.FieldsDTO;
 import com.example.backend.servicies.ItemService;
 import com.example.backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public abstract class ItemController<ClassDTO, MainClass> {
@@ -26,7 +28,12 @@ public abstract class ItemController<ClassDTO, MainClass> {
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody ClassDTO classDTO) {
-        return itemService.add(classDTO);
+        ResponseEntity<?> resp = itemService.add(classDTO);
+        if (resp.getStatusCode() != HttpStatus.OK){
+            return resp;
+        } else {
+            return ResponseEntity.ok().body(((List<?>)(Objects.requireNonNull(resp.getBody()))).get(0));
+        }
     }
 
     @GetMapping("/get_all")

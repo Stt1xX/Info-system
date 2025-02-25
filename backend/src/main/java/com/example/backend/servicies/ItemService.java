@@ -2,6 +2,11 @@ package com.example.backend.servicies;
 
 import com.example.backend.entities.DTO.PageRequestDTO;
 import com.example.backend.entities.DTO.PageResponseDTO;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
@@ -16,10 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.example.backend.repositories.DunamicQuery.Specification.hasNameContaining;
 
@@ -45,10 +49,18 @@ public abstract class ItemService<ClassDTO , MainClass> {
         this.mainClassType = mainClassType;
     }
 
+    @Retryable(value = CannotAcquireLockException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> add(ClassDTO classDTO);
 
+    // Also Serializable but Annotation set on mainImport method in FileService
+    public abstract ResponseEntity<?> addAll(Map<Integer, ClassDTO> classDTOs);
+
+    @Retryable(value = CannotAcquireLockException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public abstract ResponseEntity<?> update(Integer id, ClassDTO classDTO);
 
+    @Transactional
     public abstract ResponseEntity<?> delete(Integer id);
 
     public ResponseEntity<?> getCommits(Integer id, Integer pageNumber){
@@ -74,10 +86,24 @@ public abstract class ItemService<ClassDTO , MainClass> {
         return repository.findAll();
     }
 
+    public MainClass findById(Integer id){
+        return repository.findById(id).orElse(null);
+    }
+
     protected Map<String, String> getSocketMessage(){
         Map<String, String> response = new HashMap<>();
         response.put("user_id", userService.getCurrentUser().getId().toString());
         response.put("signal", "update");
         return response;
+    }
+
+    @SuppressWarnings("SpringTransactionalMethodCallsInspection")
+    public MainClass getObjWhileAddFunc(ClassDTO DTO) {
+        ResponseEntity<?> resp = add(DTO);
+        if (resp.getStatusCode() == HttpStatus.OK) {
+            return (MainClass)(((List<Object>)(Objects.requireNonNull(resp.getBody()))).get(1));
+        } else {
+            throw new DataIntegrityViolationException((String) resp.getBody());
+        }
     }
 }

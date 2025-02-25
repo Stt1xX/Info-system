@@ -11,7 +11,7 @@
         <p class="text-base">
           id: {{ obj.id }}<br>
           x: {{ obj.x }}<br>
-          x: {{ obj.y }}<br>
+          y: {{ obj.y }}<br>
           author: {{obj.author}}<br>
         </p>
       </div>

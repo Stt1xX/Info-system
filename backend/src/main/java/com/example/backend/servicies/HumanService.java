@@ -2,12 +2,13 @@ package com.example.backend.servicies;
 
 import com.example.backend.entities.Car;
 import com.example.backend.entities.Coordinates;
+import com.example.backend.entities.DTO.CarDTO;
+import com.example.backend.entities.DTO.CoordinatesDTO;
 import com.example.backend.entities.DTO.HumanDTO;
 import com.example.backend.entities.Human;
 import com.example.backend.entities.enums.EntityType;
-import com.example.backend.repositories.CarRepository;
-import com.example.backend.repositories.CoordinatesRepository;
 import com.example.backend.repositories.HumanRepository;
+import com.example.backend.servicies.enums.CounterIndex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -15,53 +16,108 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HumanService extends ItemService<HumanDTO, Human> {
 
-    private final CarRepository carRepository;
-    private final CoordinatesRepository coordinatesRepository;
+    private final CarService carService;
+    private final CoordinatesService coordinatesService;
 
     @Autowired
-    public HumanService(HumanRepository humanRepository, UserService userService, AuditService auditService, SimpMessagingTemplate simpMessagingTemplate, Checker checker, CarRepository carRepository, CoordinatesRepository coordinatesRepository) {
+    public HumanService(HumanRepository humanRepository, UserService userService, AuditService auditService,
+                        SimpMessagingTemplate simpMessagingTemplate, Checker checker,
+                        CarService carService, CoordinatesService coordinatesService) {
         super(humanRepository, userService, auditService, simpMessagingTemplate, checker, Human.class);
-        this.carRepository = carRepository;
-        this.coordinatesRepository = coordinatesRepository;
+        this.carService = carService;
+        this.coordinatesService = coordinatesService;
     }
 
     @Override
     public ResponseEntity<?> add(HumanDTO humanDTO) {
         ResponseEntity<?> resp = checker.validate(humanDTO);
         if (resp.getStatusCode() != HttpStatus.OK) {
+            throw new DataIntegrityViolationException((String) resp.getBody());
+        }
+        getAll().forEach(human -> {
+            if (human.getName().equals(humanDTO.getName())) {
+                throw new DataIntegrityViolationException("Error: Human with name " + humanDTO.getName() + " already exists");
+            }
+        });
+        Human human = new Human();
+        HumanDTO.setHuman(human, humanDTO);
+        Car car = carService.findById(humanDTO.getCarId());
+        Coordinates coordinates = coordinatesService.findById(humanDTO.getCoordinatesId());
+        if (car == null) {
+            return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
+        }
+        if (coordinates == null) {
+            return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
+        }
+        human.setCar(car);
+        human.setCoordinates(coordinates);
+        human.setAuthor(userService.getCurrentUser().getUsername());
+        Human updatedHuman = repository.save(human);
+        simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+        resp = auditService.doCommit(updatedHuman.getId(), EntityType.HUMAN, "Create");
+        if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
-        try{
-            Human human = new Human();
-            HumanDTO.setHuman(human, humanDTO);
-            Optional<Car> carOptional = carRepository.findById(humanDTO.getCarId());
-            Optional<Coordinates> coordinatesOptional = coordinatesRepository.findById(humanDTO.getCoordinatesId());
-            if (carOptional.isEmpty()) {
-                return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
-            }
-            if (coordinatesOptional.isEmpty()) {
-                return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
-            }
-            human.setCar(carOptional.get());
-            human.setCoordinates(coordinatesOptional.get());
-            human.setAuthor(userService.getCurrentUser().getUsername());
-            Human updatedHuman = repository.save(human);
-            simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
-            resp = auditService.doCommit(updatedHuman.getId(), EntityType.HUMAN, "Create");
+        return new ResponseEntity<>(List.of(String.format("Human %s successfully added!", human.getName()), updatedHuman), org.springframework.http.HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> addAll(Map<Integer, HumanDTO> humanDTOs) {
+        int[] ret_arr = new int[]{0, 0, 0};
+        Set<Human> humans = new HashSet<>(getAll());
+        List<Human> newHumans = new ArrayList<>();
+        String author = userService.getCurrentUser().getUsername();
+        for (Map.Entry<Integer, HumanDTO> humanDTO : humanDTOs.entrySet()) {
+            ResponseEntity<?> resp = checker.validate(humanDTO.getValue());
             if (resp.getStatusCode() != HttpStatus.OK) {
-                return resp;
+                return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": " + resp.getBody());
             }
-            return new ResponseEntity<>(String.format("Human %s successfully added!", human.getName()), org.springframework.http.HttpStatus.OK);
-        } catch (DataIntegrityViolationException e) {
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>("Error: Incorrect human's input data", HttpStatus.CONFLICT);
+            Human human = new Human();
+            human.setAuthor(author);
+            HumanDTO.setHuman(human, humanDTO.getValue());
+            if (humanDTO.getValue().getCarId() == null){
+                human.setCar(carService.getObjWhileAddFunc(
+                        new CarDTO(humanDTO.getValue().getCarName(), humanDTO.getValue().getCarIsCool()
+                )));
+                ret_arr[CounterIndex.CAR.getValue()]++;
+            } else {
+                Car car = carService.findById(humanDTO.getValue().getCarId());
+                if (car == null) {
+                    return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": " + "Error: Car not found");
+                }
+                human.setCar(car);
+            }
+            if (humanDTO.getValue().getCoordinatesId() == null){
+                human.setCoordinates(coordinatesService.getObjWhileAddFunc(
+                        new CoordinatesDTO(humanDTO.getValue().getX(), humanDTO.getValue().getY()
+                )));
+                ret_arr[CounterIndex.COORDINATES.getValue()]++;
+            } else {
+                Coordinates coordinates = coordinatesService.findById(humanDTO.getValue().getCoordinatesId());
+                if (coordinates == null) {
+                    return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": " + "Error: Coordinates not found");
+                }
+                human.setCoordinates(coordinates);
+            }
+            if (!humans.add(human)) {
+                return ResponseEntity.badRequest().body("Humans: Line " + humanDTO.getKey() + ": Error: Human with name " + human.getName() + " already exists");
+            }
+            newHumans.add(human);
         }
+        List<Human> savedHumans = repository.saveAll(newHumans);
+        simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
+        ResponseEntity<?> resp = auditService.doCommits(savedHumans.stream().map(Human::getId).collect(Collectors.toList()), EntityType.HUMAN, "Create");
+        if (resp.getStatusCode() != HttpStatus.OK) {
+            return ResponseEntity.badRequest().body((String) resp.getBody());
+        }
+        ret_arr[CounterIndex.HUMAN.getValue()] = savedHumans.size();
+        return ResponseEntity.ok(ret_arr);
     }
 
     @Override
@@ -78,18 +134,24 @@ public class HumanService extends ItemService<HumanDTO, Human> {
         if (resp.getStatusCode() != HttpStatus.OK) {
             return resp;
         }
+
+        getAll().stream().filter(_human -> !Objects.equals(_human.getName(), human.getName())).forEach(_human -> {
+            if (_human.getName().equals(humanDTO.getName())) {
+                throw new DataIntegrityViolationException("Error: Human with name " + humanDTO.getName() + " already exists");
+            }
+        });
         try {
             HumanDTO.setHuman(human, humanDTO);
-            Optional<Car> carOptional = carRepository.findById(humanDTO.getCarId());
-            Optional<Coordinates> coordinatesOptional = coordinatesRepository.findById(humanDTO.getCoordinatesId());
-            if (carOptional.isEmpty()) {
+            Car car = carService.findById(humanDTO.getCarId());
+            Coordinates coordinates = coordinatesService.findById(humanDTO.getCoordinatesId());
+            if (car == null) {
                 return new ResponseEntity<>("Error: Car not found", HttpStatus.NOT_FOUND);
             }
-            if (coordinatesOptional.isEmpty()) {
+            if (coordinates == null) {
                 return new ResponseEntity<>("Error: Coordinates not found", HttpStatus.NOT_FOUND);
             }
-            human.setCar(carOptional.get());
-            human.setCoordinates(coordinatesOptional.get());
+            human.setCar(car);
+            human.setCoordinates(coordinates);
             Human updatedHuman = repository.save(human);
             simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
             resp = auditService.doCommit(updatedHuman.getId(), EntityType.HUMAN, "Update");
@@ -116,14 +178,6 @@ public class HumanService extends ItemService<HumanDTO, Human> {
         auditService.deleteCommits(id, EntityType.HUMAN);
         simpMessagingTemplate.convertAndSend("/topic/humans", getSocketMessage());
         return new ResponseEntity<>(String.format("Human %s successfully deleted!", human.getName()), HttpStatus.OK);
-    }
-
-    public List<Human> findByCarId(Integer carId) {
-        return ((HumanRepository) (this.repository)).findAllByCar_Id(carId);
-    }
-
-    public List<Human> findByCoordinatesId(Integer carId) {
-        return ((HumanRepository) (this.repository)).findAllByCoordinates_Id(carId);
     }
 
     public void save(Human human) {

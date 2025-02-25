@@ -1,3 +1,5 @@
+import {ref} from "vue";
+
 export const AddEditWindowType = {
     ADDING : 1,
     EDITING : 2
@@ -64,4 +66,21 @@ export const getHeader = (value) => {
         default:
             return 'UNDEFINED';
     }
+}
+
+export const username = ref()
+export const admin_role = ref()
+
+export function get_user_info() {
+    $.ajax({
+        type: 'GET',
+        url : '/users/get_user_info',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        success : (resp) => {
+            username.value = resp.username
+            admin_role.value = resp.admin_role
+        }
+    })
 }

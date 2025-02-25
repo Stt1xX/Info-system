@@ -158,7 +158,6 @@ const setTheMood = () => {
       'X-CSRF-Token': token.value
     },
     success: (resp) => {
-      console.log(resp)
       showAlert(resp)
     }
   });

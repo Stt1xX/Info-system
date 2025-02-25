@@ -7,6 +7,7 @@ import ErrorPage from "@/errors/ErrorPage.vue";
 import HumanPage from "@/views/HumanPage.vue";
 import CoordinatePage from "@/views/CoordinatePage.vue";
 import CarPage from "@/views/CarPage.vue";
+import ImportPage from "@/views/ImportPage.vue";
 
 const routes = [
     {path: "/humanTable", component: HumanPage},
@@ -16,6 +17,7 @@ const routes = [
     {path: "/registration", component: RegistryPage},
     {path: "/admin/messages", component: MessagesPage},
     {path: "/error/ErrorPage", component: ErrorPage },
+    {path: "/importFile", component: ImportPage },
     {path: "/", redirect: {path: "/humanTable"}},
     {
         path: '/:pathMatch(.*)*',

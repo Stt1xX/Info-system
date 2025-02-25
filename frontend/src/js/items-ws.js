@@ -2,7 +2,7 @@ import {ref} from "vue";
 
 import {Stomp} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import {getUrlPrefix, ItemType} from "@/js/utils.js";
+import {getUrlPrefix, ItemType } from "@/js/utils.js";
 
 const defObj = (page_size) => ({
     data: [],

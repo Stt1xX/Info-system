@@ -4,15 +4,17 @@ import com.example.backend.entities.Anntotations.SearchableField;
 import com.example.backend.entities.Anntotations.SortableField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "coordinates")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Coordinates extends ManagedEntity{
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ColumnDefault("nextval('coordinates_id_seq')")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "coords_seq_gen")
+    @SequenceGenerator(name = "coords_seq_gen", sequenceName = "coords_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     @SortableField(name = "id")
     @SearchableField(name = "id")
@@ -50,4 +52,24 @@ public class Coordinates extends ManagedEntity{
         this.y = y;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Coordinates that = (Coordinates) o;
+        return Objects.equals(x, that.x) && Objects.equals(y, that.y);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
+
+    @Override
+    public String toString() {
+        return "Coordinates{" +
+                "id=" + id +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }
