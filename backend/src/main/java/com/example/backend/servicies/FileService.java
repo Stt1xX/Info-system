@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.exception.LockAcquisitionException;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.CannotAcquireLockException;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,16 +46,18 @@ public class FileService {
     private final CoordinatesService coordinatesService;
     private final HumanService humanService;
     private final ImportRecordService importRecordService;
+    private final MinioService minioService;
 
     @Lazy
     @Autowired
     private FileService self;
 
-    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService) {
+    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService, MinioService minioService) {
         this.carService = carService;
         this.coordinatesService = coordinatesService;
         this.humanService = humanService;
         this.importRecordService = importRecordService;
+        this.minioService = minioService;
     }
 
     public ResponseEntity<?> mainImport(MultipartFile file) throws IOException {
@@ -111,30 +113,32 @@ public class FileService {
     @Retryable(value = CannotAcquireLockException.class, maxAttempts = ArchiveProcessor.THREAD_POOL_SIZE)
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseEntity<?> importFile(File file) {
-
         if (file == null || !file.exists() || file.length() == 0) {
             return ResponseEntity.badRequest().body("File is empty or does not exist!");
         }
         try (InputStream inputStream = new FileInputStream(file);
              Workbook workbook = new XSSFWorkbook(inputStream)) {
+            int recordId = importRecordService.createRecord();
+            minioService.registerRollbackHandler(recordId + "");
+            minioService.uploadFile(recordId + "", inputStream, Files.probeContentType(file.toPath()));
             ResponseEntity<?> resp = carService.addAll(getCars(workbook));
             int[] cars_num, coords_num, humans_num;
             if (resp.getStatusCode() != HttpStatus.OK) {
-                importRecordService.createFailedRecord();
+                importRecordService.setFailedRecord(recordId);
                 throw new DataIntegrityViolationException((String)resp.getBody());
             } else {
                 cars_num = (int[])resp.getBody();
             }
             resp = coordinatesService.addAll(getCoordinates(workbook));
             if (resp.getStatusCode() != HttpStatus.OK) {
-                importRecordService.createFailedRecord();
+                importRecordService.setFailedRecord(recordId);
                 throw new DataIntegrityViolationException((String)resp.getBody());
             } else {
                 coords_num = (int[])resp.getBody();
             }
             resp = humanService.addAll(getHumans(workbook));
             if (resp.getStatusCode() != HttpStatus.OK) {
-                importRecordService.createFailedRecord();
+                importRecordService.setFailedRecord(recordId);
                 throw new DataIntegrityViolationException((String)resp.getBody());
             } else {
                 humans_num = (int[])resp.getBody();
@@ -144,17 +148,14 @@ public class FileService {
                         + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
                 coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
                         (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
-            importRecordService.createSuccessRecord(cars_num_sum, humans_num_sum, coords_num_sum);
+            importRecordService.setSuccessRecord(recordId, cars_num_sum, humans_num_sum, coords_num_sum);
             return ResponseEntity.ok("The file has been processed successfully!");
 
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("File processing error");
         }
-
-//        catch (CannotAcquireLockException e) {
-//            return ResponseEntity.badRequest().body("File processing error");
-//        }
     }
+
 
     private Map<Integer, CarDTO> getCars(Workbook workbook) throws IllegalStateException {
         Sheet sheet = workbook.getSheet(sheetNames[0]);
@@ -263,6 +264,7 @@ public class FileService {
 
     private static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
         File file = File.createTempFile("upload_", "_" + multipartFile.getOriginalFilename());
+        System.out.println(file.getName());
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(multipartFile.getBytes());
         }

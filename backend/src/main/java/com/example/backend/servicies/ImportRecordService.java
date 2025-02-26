@@ -56,21 +56,29 @@ public class ImportRecordService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createFailedRecord() {
-        ImportRecord importRecord = new ImportRecord();
+    public void setFailedRecord(int id) {
+        ImportRecord importRecord = importRecordRepository.findById(id).orElseThrow();
         importRecord.setStatus(ImportStatus.FAILED);
         importRecord.setAuthor(userService.getCurrentUser());
         importRecordRepository.save(importRecord);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createSuccessRecord(int cars, int humans, int coordinates) {
-        ImportRecord importRecord = new ImportRecord();
+    public void setSuccessRecord(int id, int cars, int humans, int coordinates) {
+        ImportRecord importRecord = importRecordRepository.findById(id).orElseThrow();
         importRecord.setStatus(ImportStatus.SUCCESS);
         importRecord.setAuthor(userService.getCurrentUser());
         importRecord.setCompletedCars(cars);
         importRecord.setCompletedHumans(humans);
         importRecord.setCompletedCoordinates(coordinates);
         importRecordRepository.save(importRecord);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int createRecord() {
+        ImportRecord importRecord = new ImportRecord();
+        importRecord.setAuthor(userService.getCurrentUser());
+        importRecord.setStatus(ImportStatus.IN_PROGRESS);
+        return importRecordRepository.save(importRecord).getId();
     }
 }
