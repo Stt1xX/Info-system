@@ -11,6 +11,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.exception.LockAcquisitionException;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.CannotAcquireLockException;
@@ -97,7 +99,7 @@ public class FileService {
                 if (future.get().getStatusCode() == HttpStatus.OK) {
                     successFiles++;
                 }
-            } catch (InterruptedException | ExecutionException e){
+            } catch (LockAcquisitionException | InterruptedException | ExecutionException e){
                 // ignoring
             }
         }
