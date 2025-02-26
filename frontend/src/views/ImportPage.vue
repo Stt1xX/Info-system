@@ -27,11 +27,6 @@
               </svg>
             </button>
           </div>
-          <div>
-            <button type="button" @click="downloadFile">
-                Download File
-            </button>
-          </div>
         </div>
       </div>
     </main>
@@ -92,11 +87,6 @@ const handleSend = () => {
     fileInput.value.value = null;
   }
 };
-
-const downloadFile = () => {
-  window.location.href = '/minio/download/test.txt';
-};
-
 
 const viewImportHistory = () => {
   openHistoryWindow();

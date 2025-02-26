@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 @Service
 public class MinioService {
@@ -26,20 +29,22 @@ public class MinioService {
         this.bucketName = bucket;
     }
 
-    public void uploadFile(String objectName, InputStream inputStream, String contentType) {
-        try {
+    public void uploadFile(String objectName, File file) {
+        try (InputStream inputStream = new FileInputStream(file)) { // Открываем новый поток
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)
                             .object(objectName)
-                            .stream(inputStream, -1, 5242880) // 5MB buffer
-                            .contentType(contentType)
+                            .stream(inputStream, file.length(), 5242880)
+                            .contentType(Files.probeContentType(file.toPath()))
                             .build()
             );
         } catch (Exception e) {
-            throw new RuntimeException("Error when uploading a file to MinIO");
+            throw new RuntimeException("Error when uploading a file to MinIO", e);
         }
     }
+
+
 
     public InputStream downloadFile(String objectName) throws Exception {
         return minioClient.getObject(
@@ -50,7 +55,7 @@ public class MinioService {
         );
     }
 
-    public void deleteFile(String objectName) throws Exception {
+    private void deleteFile(String objectName) throws Exception {
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
                         .bucket(bucketName)

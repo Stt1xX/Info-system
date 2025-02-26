@@ -6,6 +6,7 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
     </TestPlan>
     <hashTree>
       <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager">
@@ -14,7 +15,7 @@
         <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
       </CookieManager>
       <hashTree/>
-      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
         <collectionProp name="HeaderManager.headers">
           <elementProp name="" elementType="Header">
             <stringProp name="Header.name">X-CSRF-Token</stringProp>
@@ -37,7 +38,7 @@
         <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="BeanShell Sampler">
           <stringProp name="BeanShellSampler.query">import java.io.*;
 
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\\session.csv&quot;);
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/1/session.csv&quot;);
 try {
     if (file.exists()) {
         new FileWriter(file, false).close(); // Очищает файл
@@ -64,7 +65,7 @@ try {
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="csrf token">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="csrf token" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -89,7 +90,7 @@ try {
           </RegexExtractor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="registration">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="registration" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -119,7 +120,7 @@ try {
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -167,18 +168,18 @@ try {
             <stringProp name="script">import java.io.*;
 
 try {
-	File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\\session.csv&quot;);
+	File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/1/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
-    
+
     String sessionId = vars.get(&quot;JSESSIONID&quot;);  // JSESSIONID после логина
-    
+
     if (sessionId != null &amp;&amp; !sessionId.equals(&quot;NOT_FOUND&quot;)) {
         out.println(sessionId);
     } else {
         log.error(&quot;JSESSIONID не найден!&quot;);
     }
-    
+
     out.close();
     fw.close();
 } catch (IOException e) {
@@ -303,18 +304,18 @@ try {
             <stringProp name="script">import java.io.*;
 
 try {
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\\session.csv&quot;);
+	File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/1/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
-    
+
     String sessionId = vars.get(&quot;JSESSIONID&quot;);  // JSESSIONID после логина
-    
+
     if (sessionId != null &amp;&amp; !sessionId.equals(&quot;NOT_FOUND&quot;)) {
         out.println(sessionId);
     } else {
         log.error(&quot;JSESSIONID не найден!&quot;);
     }
-    
+
     out.close();
     fw.close();
 } catch (IOException e) {
@@ -422,7 +423,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
+          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
             <stringProp name="RegexExtractor.useHeaders">true</stringProp>
             <stringProp name="RegexExtractor.refname">JSESSIONID</stringProp>
             <stringProp name="RegexExtractor.regex">JSESSIONID=(.+?);</stringProp>
@@ -439,18 +440,18 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\
             <stringProp name="script">import java.io.*;
 
 try {
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\\session.csv&quot;);
+	File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/1/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
-    
+
     String sessionId = vars.get(&quot;JSESSIONID&quot;);  // JSESSIONID после логина
-    
+
     if (sessionId != null &amp;&amp; !sessionId.equals(&quot;NOT_FOUND&quot;)) {
         out.println(sessionId);
     } else {
         log.error(&quot;JSESSIONID не найден!&quot;);
     }
-    
+
     out.close();
     fw.close();
 } catch (IOException e) {
@@ -461,7 +462,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Post parallel query">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Post parallel query" enabled="true">
         <intProp name="ThreadGroup.num_threads">3</intProp>
         <intProp name="ThreadGroup.ramp_time">0</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -472,21 +473,21 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\1\
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
           <stringProp name="cacheKey">true</stringProp>
           <stringProp name="script">def filename = vars.get(&quot;filename&quot;) // Получаем значение переменной
-def filePath = &quot;C:/Users/ramti/Desktop/Info-system/jmx-tests/importData/${filename}.xlsx&quot;
+def filePath = &quot;../importData/${filename}.xlsx&quot;
 
 // Устанавливаем в переменную, чтобы подставить в HTTP Request
 vars.put(&quot;fullFilePath&quot;, filePath)
 </stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Requests DATA">
-          <stringProp name="filename">C:/Users/ramti/Desktop/Info-system/jmx-tests/1/requests.csv</stringProp>
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Requests DATA" enabled="true">
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/1/requests.csv</stringProp>
           <stringProp name="fileEncoding"></stringProp>
           <stringProp name="variableNames">carname,cool,x,y,filename</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
@@ -497,10 +498,10 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           <stringProp name="shareMode">shareMode.all</stringProp>
         </CSVDataSet>
         <hashTree/>
-        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="JSESSIONSID">
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="JSESSIONSID" enabled="true">
           <stringProp name="delimiter">,</stringProp>
           <stringProp name="fileEncoding"></stringProp>
-          <stringProp name="filename">C:/Users/ramti/Desktop/Info-system/jmx-tests/1/session.csv</stringProp>
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/1/session.csv</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
           <boolProp name="quotedData">false</boolProp>
           <boolProp name="recycle">true</boolProp>
@@ -509,7 +510,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           <stringProp name="variableNames">JSESSIONID</stringProp>
         </CSVDataSet>
         <hashTree/>
-        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
           <collectionProp name="HeaderManager.headers">
             <elementProp name="" elementType="Header">
               <stringProp name="Header.name">Cookie</stringProp>
@@ -518,7 +519,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="csrf token">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="csrf token" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -532,7 +533,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
+          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
             <stringProp name="RegexExtractor.useHeaders">false</stringProp>
             <stringProp name="RegexExtractor.refname">csrf_token</stringProp>
             <stringProp name="RegexExtractor.regex">&quot;csrfToken&quot;\s*:\s*&quot;(.+?)&quot;</stringProp>
@@ -543,7 +544,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           </RegexExtractor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="add new car">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="add new car" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -563,7 +564,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
@@ -573,7 +574,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="add new coords">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="add new coords" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -603,7 +604,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="import File">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="import File" enabled="true">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -626,17 +627,7 @@ vars.put(&quot;fullFilePath&quot;, filePath)
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
         </HTTPSamplerProxy>
-        <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
-            <collectionProp name="HeaderManager.headers">
-              <elementProp name="" elementType="Header">
-                <stringProp name="Header.name">Content-Type</stringProp>
-                <stringProp name="Header.value">multipart/form-data</stringProp>
-              </elementProp>
-            </collectionProp>
-          </HeaderManager>
-          <hashTree/>
-        </hashTree>
+        <hashTree/>
       </hashTree>
       <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
         <boolProp name="ResultCollector.error_logging">false</boolProp>

@@ -6,6 +6,7 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
     </TestPlan>
     <hashTree>
       <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager">
@@ -34,10 +35,10 @@
         </elementProp>
       </SetupThreadGroup>
       <hashTree>
-        <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="BeanShell Sampler" enabled="true">
+        <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="BeanShell Sampler">
           <stringProp name="BeanShellSampler.query">import java.io.*;
 
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\\session.csv&quot;);
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/session.csv&quot;);
 try {
     if (file.exists()) {
         new FileWriter(file, false).close(); // Очищает файл
@@ -53,7 +54,7 @@ try {
         </BeanShellSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User1" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User1">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -89,7 +90,7 @@ try {
           </RegexExtractor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="registration" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="registration">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -160,14 +161,14 @@ try {
             <stringProp name="RegexExtractor.match_number">1</stringProp>
           </RegexExtractor>
           <hashTree/>
-          <BeanShellPostProcessor guiclass="TestBeanGUI" testclass="BeanShellPostProcessor" testname="BeanShell PostProcessor" enabled="true">
+          <BeanShellPostProcessor guiclass="TestBeanGUI" testclass="BeanShellPostProcessor" testname="BeanShell PostProcessor">
             <stringProp name="filename"></stringProp>
             <stringProp name="parameters"></stringProp>
             <boolProp name="resetInterpreter">false</boolProp>
             <stringProp name="script">import java.io.*;
 
 try {
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\\session.csv&quot;);
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
     
@@ -266,14 +267,14 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
             <stringProp name="RegexExtractor.match_number">1</stringProp>
           </RegexExtractor>
           <hashTree/>
-          <BeanShellPostProcessor guiclass="TestBeanGUI" testclass="BeanShellPostProcessor" testname="BeanShell PostProcessor" enabled="true">
+          <BeanShellPostProcessor guiclass="TestBeanGUI" testclass="BeanShellPostProcessor" testname="BeanShell PostProcessor">
             <stringProp name="filename"></stringProp>
             <stringProp name="parameters"></stringProp>
             <boolProp name="resetInterpreter">false</boolProp>
             <stringProp name="script">import java.io.*;
 
 try {
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\\session.csv&quot;);
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
     
@@ -294,7 +295,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
           </BeanShellPostProcessor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="csrf token" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="csrf token">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -308,7 +309,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
+          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
             <stringProp name="RegexExtractor.useHeaders">false</stringProp>
             <stringProp name="RegexExtractor.refname">csrf_token</stringProp>
             <stringProp name="RegexExtractor.regex">&quot;csrfToken&quot;\s*:\s*&quot;(.+?)&quot;</stringProp>
@@ -319,7 +320,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
           </RegexExtractor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="add new car" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="add new car">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
@@ -350,7 +351,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Post parallel query">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Post parallel query" enabled="true">
         <intProp name="ThreadGroup.num_threads">2</intProp>
         <intProp name="ThreadGroup.ramp_time">0</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -362,7 +363,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
       </ThreadGroup>
       <hashTree>
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Requests DATA" enabled="true">
-          <stringProp name="filename">C:/Users/ramti/Desktop/Info-system/jmx-tests/2/requests.csv</stringProp>
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/requests.csv</stringProp>
           <stringProp name="fileEncoding"></stringProp>
           <stringProp name="variableNames">carnameForUpdate</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
@@ -376,7 +377,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="JSESSIONSID" enabled="true">
           <stringProp name="delimiter">,</stringProp>
           <stringProp name="fileEncoding"></stringProp>
-          <stringProp name="filename">C:/Users/ramti/Desktop/Info-system/jmx-tests/2/session.csv</stringProp>
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/session.csv</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
           <boolProp name="quotedData">false</boolProp>
           <boolProp name="recycle">true</boolProp>
@@ -464,7 +465,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="JSESSIONSID" enabled="true">
           <stringProp name="delimiter">,</stringProp>
           <stringProp name="fileEncoding"></stringProp>
-          <stringProp name="filename">C:/Users/ramti/Desktop/Info-system/jmx-tests/2/session.csv</stringProp>
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/session.csv</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
           <boolProp name="quotedData">false</boolProp>
           <boolProp name="recycle">true</boolProp>
@@ -561,7 +562,7 @@ File file = new File(&quot;C:\\Users\\ramti\\Desktop\\Info-system\\jmx-tests\\2\
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="JSESSIONSID" enabled="true">
           <stringProp name="delimiter">,</stringProp>
           <stringProp name="fileEncoding"></stringProp>
-          <stringProp name="filename">C:/Users/ramti/Desktop/Info-system/jmx-tests/2/session.csv</stringProp>
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/2/session.csv</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
           <boolProp name="quotedData">false</boolProp>
           <boolProp name="recycle">true</boolProp>

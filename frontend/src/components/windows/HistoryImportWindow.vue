@@ -6,7 +6,9 @@
         <li
             v-for="_import in imports"
             :key="_import.id"
-            class="p-2 hover:bg-gray-700 border-b border-gray-600 first:rounded-t-lg last:rounded-b-lg last:border-b-0 transition-colors"
+            class="p-2 border-b hover:bg-gray-700 border-gray-600 first:rounded-t-lg last:rounded-b-lg last:border-b-0 transition-colors"
+            :class="{ 'cursor-pointer': _import.importStatus === 'Success' }"
+            @click="_import.importStatus === 'Success' && downloadFile(_import.id)"
         >
           <div class="grid grid-cols-[1fr_auto] gap-4 items-center">
             <!-- Левая часть -->
@@ -18,7 +20,7 @@
             <!-- Правая часть -->
             <div class="flex flex-col items-end">
               <div v-if="_import.importStatus === 'Success'" class="text-gray-300 text-sm">
-                cars: {{ _import.completedCars }} / coords: {{ _import.completedCoordinates }} / humans: {{_import.completedHumans}}
+                cars: {{ _import.completedCars }} / coords: {{ _import.completedCoordinates }} / humans: {{ _import.completedHumans }}
               </div>
               <div
                   :class="{
@@ -36,7 +38,7 @@
         It's quiet here so far...
       </div>
       <div class="flex justify-between items-center mt-6">
-        <PaginationImportHistory/>
+        <PaginationImportHistory />
         <button @click="closeWindow" type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           Close
         </button>
@@ -46,26 +48,26 @@
 </template>
 
 <script setup>
-import {onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import PaginationImportHistory from "@/components/shared_comps/PaginationImportHistory.vue";
-import {get, imports, pageNumber} from "@/js/import-history.js";
+import { get, imports, pageNumber } from "@/js/import-history.js";
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const closeWindow = () => {
-  emit('close');
+  emit("close");
+};
+
+const downloadFile = (id) => {
+  window.location.href = `/minio/download/${id}`;
 };
 
 onMounted(() => {
-  get()
-})
+  get();
+});
 
 onUnmounted(() => {
-  pageNumber.value = 0
-  imports.value = []
-})
-
+  pageNumber.value = 0;
+  imports.value = [];
+});
 </script>
-
-<style scoped>
-</style>

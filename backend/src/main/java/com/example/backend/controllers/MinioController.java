@@ -17,13 +17,13 @@ public class MinioController {
     }
 
     @GetMapping("/download/{fileName}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable String fileName) {
-        try (InputStream stream = minioService.downloadFile(fileName)) {
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Integer fileName) {
+        try (InputStream stream = minioService.downloadFile(fileName + "")) {
             byte[] fileBytes = stream.readAllBytes();
             //set headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDisposition(ContentDisposition.attachment().filename(fileName).build());
+            headers.setContentDisposition(ContentDisposition.attachment().filename(fileName + ".xlsx").build());
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(fileBytes);

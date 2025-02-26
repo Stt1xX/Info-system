@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +119,7 @@ public class FileService {
              Workbook workbook = new XSSFWorkbook(inputStream)) {
             int recordId = importRecordService.createRecord();
             minioService.registerRollbackHandler(recordId + "");
-            minioService.uploadFile(recordId + "", inputStream, Files.probeContentType(file.toPath()));
+            minioService.uploadFile(recordId + "", file);
             ResponseEntity<?> resp = carService.addAll(getCars(workbook));
             int[] cars_num, coords_num, humans_num;
             if (resp.getStatusCode() != HttpStatus.OK) {
@@ -264,7 +263,6 @@ public class FileService {
 
     private static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
         File file = File.createTempFile("upload_", "_" + multipartFile.getOriginalFilename());
-        System.out.println(file.getName());
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(multipartFile.getBytes());
         }
