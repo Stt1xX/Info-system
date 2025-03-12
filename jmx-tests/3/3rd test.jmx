@@ -6,6 +6,7 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
     </TestPlan>
     <hashTree>
       <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager">
@@ -37,7 +38,7 @@
         <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="BeanShell Sampler" enabled="true">
           <stringProp name="BeanShellSampler.query">import java.io.*;
 
-File file = new File(&quot;C:\\Users\\ramti\\Desktop\\session.csv&quot;);
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/3/session.csv&quot;);
 try {
     if (file.exists()) {
         new FileWriter(file, false).close(); // Очищает файл
@@ -53,7 +54,7 @@ try {
         </BeanShellSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User1">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User1" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -109,7 +110,7 @@ try {
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
@@ -150,7 +151,7 @@ try {
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
+          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
             <stringProp name="RegexExtractor.useHeaders">true</stringProp>
             <stringProp name="RegexExtractor.refname">JSESSIONID</stringProp>
             <stringProp name="RegexExtractor.regex">JSESSIONID=(.+?);</stringProp>
@@ -167,7 +168,7 @@ try {
             <stringProp name="script">import java.io.*;
 
 try {
-    File file = new File(&quot;C:\\Users\\ramti\\Desktop\\session.csv&quot;); 
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/3/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
     
@@ -303,7 +304,7 @@ try {
             <stringProp name="script">import java.io.*;
 
 try {
-    File file = new File(&quot;C:\\Users\\ramti\\Desktop\\session.csv&quot;); 
+File file = new File(&quot;C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/3/session.csv&quot;);
     FileWriter fw = new FileWriter(file, true);  // Открываем файл в режиме ДОБАВЛЕНИЯ
     PrintWriter out = new PrintWriter(fw);
     
@@ -339,7 +340,7 @@ try {
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
           <stringProp name="delimiter">,</stringProp>
           <stringProp name="fileEncoding"></stringProp>
-          <stringProp name="filename">C:\\Users\\ramti\\Desktop\\session.csv</stringProp>
+          <stringProp name="filename">C:/Users/ramti/Desktop/ITMO/Info-system/jmx-tests/3/session.csv</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
           <boolProp name="quotedData">false</boolProp>
           <boolProp name="recycle">true</boolProp>

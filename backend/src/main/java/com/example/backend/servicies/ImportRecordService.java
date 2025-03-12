@@ -63,7 +63,7 @@ public class ImportRecordService {
         importRecordRepository.save(importRecord);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+//    @Transactional(propagation = Propagation.REQUIRES_NEW) -- not needed
     public void createSuccessRecord(int cars, int humans, int coordinates) {
         ImportRecord importRecord = new ImportRecord();
         importRecord.setStatus(ImportStatus.SUCCESS);
