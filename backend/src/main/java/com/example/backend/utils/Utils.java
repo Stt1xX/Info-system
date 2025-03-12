@@ -45,4 +45,8 @@ public class Utils {
         }
         return sortableFields;
     }
+
+    public static String generateFileName(String prefix, String suffix) {
+        return prefix + "-" + Instant.now().toString().replace(":", "-") + "-" + suffix;
+    }
 }

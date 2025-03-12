@@ -50,35 +50,34 @@ public class ImportRecordService {
                                 record.getCompletedCars(),
                                 record.getCompletedCoordinates(),
                                 record.getCompletedHumans()
-                                ))
+                        ))
                         .toList(),
                         new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements())));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void setFailedRecord(int id) {
-        ImportRecord importRecord = importRecordRepository.findById(id).orElseThrow();
+    public void createFailedRecord() {
+        ImportRecord importRecord = new ImportRecord();
+        importRecord.setAuthor(userService.getCurrentUser());
         importRecord.setStatus(ImportStatus.FAILED);
         importRecord.setAuthor(userService.getCurrentUser());
         importRecordRepository.save(importRecord);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void setSuccessRecord(int id, int cars, int humans, int coordinates) {
-        ImportRecord importRecord = importRecordRepository.findById(id).orElseThrow();
+    public void createSuccessRecord(int cars, int humans, int coordinates, String fileName) {
+        ImportRecord importRecord = new ImportRecord();
+        importRecord.setAuthor(userService.getCurrentUser());
         importRecord.setStatus(ImportStatus.SUCCESS);
         importRecord.setAuthor(userService.getCurrentUser());
         importRecord.setCompletedCars(cars);
         importRecord.setCompletedHumans(humans);
         importRecord.setCompletedCoordinates(coordinates);
+        importRecord.setFileName(fileName);
         importRecordRepository.save(importRecord);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public int createRecord() {
-        ImportRecord importRecord = new ImportRecord();
-        importRecord.setAuthor(userService.getCurrentUser());
-        importRecord.setStatus(ImportStatus.IN_PROGRESS);
-        return importRecordRepository.save(importRecord).getId();
+    public ImportRecord findById(int id) {
+        return importRecordRepository.findById(id).orElseThrow();
     }
 }

@@ -24,11 +24,22 @@ public class ImportRecord {
     @Column(name = "completed_cars")
     private Integer completedCars;
 
+    @Column(name = "file_name")
+    private String fileName;
+
     @Column(name = "completed_coordinates")
     private Integer completedCoordinates;
 
     @Column(name = "completed_humans")
     private Integer completedHumans;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public Integer getId() {
         return id;

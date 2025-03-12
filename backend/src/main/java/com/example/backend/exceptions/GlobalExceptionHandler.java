@@ -1,14 +1,18 @@
 package com.example.backend.exceptions;
 
 import org.hibernate.StaleObjectStateException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.net.ConnectException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,5 +40,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ OptimisticLockingFailureException.class, StaleObjectStateException.class })
     public ResponseEntity<String> handleOptimisticLocking(Exception e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Entity was modified or deleted by another transaction.");
+    }
+
+    @ExceptionHandler({DataAccessResourceFailureException.class, CannotGetJdbcConnectionException.class, ConnectException.class})
+    public ResponseEntity<String> handleDataAccessResourceFailureException(Exception e) {
+        return new ResponseEntity<>("Database connection is lost", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

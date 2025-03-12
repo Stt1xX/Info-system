@@ -54,6 +54,7 @@ public class CarService extends ItemService<CarDTO, Car> {
 
     @Override
     public ResponseEntity<?> addAll(Map<Integer, CarDTO> carDTOs) {
+
         Set<Car> cars = new HashSet<>(getAll());
         List<Car> newCars = new ArrayList<>();
         String author = userService.getCurrentUser().getUsername();

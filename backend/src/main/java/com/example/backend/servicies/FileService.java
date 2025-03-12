@@ -14,11 +14,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,18 +48,18 @@ public class FileService {
     private final CarService carService;
     private final CoordinatesService coordinatesService;
     private final HumanService humanService;
-    private final ImportRecordService importRecordService;
     private final MinioService minioService;
+
+    public static final int MAX_RETRY_COUNT = ArchiveProcessor.THREAD_POOL_SIZE;
 
     @Lazy
     @Autowired
     private FileService self;
 
-    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService, MinioService minioService) {
+    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, MinioService minioService) {
         this.carService = carService;
         this.coordinatesService = coordinatesService;
         this.humanService = humanService;
-        this.importRecordService = importRecordService;
         this.minioService = minioService;
     }
 
@@ -109,7 +113,7 @@ public class FileService {
         return ResponseEntity.ok("Processed " + successFiles + " files from archive");
     }
 
-    @Retryable(value = CannotAcquireLockException.class, maxAttempts = ArchiveProcessor.THREAD_POOL_SIZE)
+    @Retryable(maxAttempts = MAX_RETRY_COUNT, listeners = "transactionListener")
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseEntity<?> importFile(File file) {
         if (file == null || !file.exists() || file.length() == 0) {
@@ -117,41 +121,42 @@ public class FileService {
         }
         try (InputStream inputStream = new FileInputStream(file);
              Workbook workbook = new XSSFWorkbook(inputStream)) {
-            int recordId = importRecordService.createRecord();
-            minioService.registerRollbackHandler(recordId + "");
-            minioService.uploadFile(recordId + "", file);
             ResponseEntity<?> resp = carService.addAll(getCars(workbook));
             int[] cars_num, coords_num, humans_num;
             if (resp.getStatusCode() != HttpStatus.OK) {
-                importRecordService.setFailedRecord(recordId);
-                throw new DataIntegrityViolationException((String)resp.getBody());
+                throw new DataIntegrityViolationException((String) resp.getBody());
             } else {
-                cars_num = (int[])resp.getBody();
+                cars_num = (int[]) resp.getBody();
             }
             resp = coordinatesService.addAll(getCoordinates(workbook));
             if (resp.getStatusCode() != HttpStatus.OK) {
-                importRecordService.setFailedRecord(recordId);
-                throw new DataIntegrityViolationException((String)resp.getBody());
+                throw new DataIntegrityViolationException((String) resp.getBody());
             } else {
-                coords_num = (int[])resp.getBody();
+                coords_num = (int[]) resp.getBody();
             }
             resp = humanService.addAll(getHumans(workbook));
             if (resp.getStatusCode() != HttpStatus.OK) {
-                importRecordService.setFailedRecord(recordId);
-                throw new DataIntegrityViolationException((String)resp.getBody());
+                throw new DataIntegrityViolationException((String) resp.getBody());
             } else {
-                humans_num = (int[])resp.getBody();
+                humans_num = (int[]) resp.getBody();
             }
+            RetryContext context = RetrySynchronizationManager.getContext();
             int humans_num_sum = humans_num != null ? humans_num[CounterIndex.HUMAN.getValue()] : 0,
-                cars_num_sum = (cars_num != null ? cars_num[CounterIndex.CAR.getValue()] : 0)
-                        + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
-                coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
-                        (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
-            importRecordService.setSuccessRecord(recordId, cars_num_sum, humans_num_sum, coords_num_sum);
-            return ResponseEntity.ok("The file has been processed successfully!");
+                    cars_num_sum = (cars_num != null ? cars_num[CounterIndex.CAR.getValue()] : 0)
+                            + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
+                    coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
+                            (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
 
+            String fileName = minioService.uploadFile(file);
+
+            context.setAttribute("humans", humans_num_sum);
+            context.setAttribute("cars", cars_num_sum);
+            context.setAttribute("coords", coords_num_sum);
+            context.setAttribute("fileName", fileName);
+
+            return ResponseEntity.ok("The file has been processed successfully!");
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("File processing error");
+            throw new DataIntegrityViolationException("File processing error");
         }
     }
 
@@ -267,5 +272,50 @@ public class FileService {
             fos.write(multipartFile.getBytes());
         }
         return file;
+    }
+}
+
+@Component
+class TransactionListener implements RetryListener {
+
+    private final ImportRecordService importRecordService;
+    private final MinioService minioService;
+
+    public TransactionListener(ImportRecordService importRecordService, MinioService minioService) {
+        this.importRecordService = importRecordService;
+        this.minioService = minioService;
+    }
+
+    @Override
+    public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+        if (context.getRetryCount() == FileService.MAX_RETRY_COUNT) {
+            importRecordService.createFailedRecord();
+        }
+        try {
+            String fileName = (String) context.getAttribute("fileName");
+            if (fileName != null) {
+                minioService.deleteFile(fileName);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    @Override
+    public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+        if (!context.hasAttribute(RetryContext.EXHAUSTED)) {
+            Integer cars = (Integer) context.getAttribute("cars");
+            Integer humans = (Integer) context.getAttribute("humans");
+            Integer coords = (Integer) context.getAttribute("coords");
+            String fileName = (String) context.getAttribute("fileName");
+            if (cars != null && humans != null && coords != null && fileName != null) {
+                importRecordService.createSuccessRecord(cars, humans, coords, fileName);
+            }
+        }
+    }
+
+    @Override
+    public <T, E extends Throwable> boolean open(RetryContext retryContext, RetryCallback<T, E> retryCallback) {
+        return true;
     }
 }

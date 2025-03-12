@@ -1,9 +1,9 @@
 package com.example.backend.servicies;
+import com.example.backend.utils.Utils;
 import io.minio.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,13 +15,18 @@ public class MinioService {
 
     private final MinioClient minioClient;
     private final String bucketName;
+    private final UserService userService;
+    private final ImportRecordService importRecordService;
 
     public MinioService(
             @Value("${minio.url}") String url,
             @Value("${minio.access-key}") String accessKey,
             @Value("${minio.secret-key}") String secretKey,
-            @Value("${minio.bucket-name}") String bucket
+            @Value("${minio.bucket-name}") String bucket,
+            UserService userService, ImportRecordService importRecordService1
     ) {
+        this.userService = userService;
+        this.importRecordService = importRecordService1;
         this.minioClient = MinioClient.builder()
                 .endpoint(url)
                 .credentials(accessKey, secretKey)
@@ -29,33 +34,35 @@ public class MinioService {
         this.bucketName = bucket;
     }
 
-    public void uploadFile(String objectName, File file) {
-        try (InputStream inputStream = new FileInputStream(file)) { // Открываем новый поток
+    public String uploadFile(File file) {
+        try (InputStream inputStream = new FileInputStream(file)) {
+            String fileName = Utils.generateFileName(userService.getCurrentUser().getUsername(), "document");
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)
-                            .object(objectName)
+                            .object(fileName)
                             .stream(inputStream, file.length(), 5242880)
                             .contentType(Files.probeContentType(file.toPath()))
                             .build()
             );
+            return fileName;
         } catch (Exception e) {
-            throw new RuntimeException("Error when uploading a file to MinIO", e);
+            throw new DataIntegrityViolationException("Error uploading file to Minio");
         }
     }
 
 
 
-    public InputStream downloadFile(String objectName) throws Exception {
+    public InputStream downloadFile(Integer recordId) throws Exception {
         return minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(bucketName)
-                        .object(objectName)
+                        .object(importRecordService.findById(recordId).getFileName())
                         .build()
         );
     }
 
-    private void deleteFile(String objectName) throws Exception {
+    public void deleteFile(String objectName) throws Exception {
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
                         .bucket(bucketName)
@@ -63,22 +70,4 @@ public class MinioService {
                         .build()
         );
     }
-
-    public void registerRollbackHandler(String objectName) {
-        if (TransactionSynchronizationManager.isActualTransactionActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCompletion(int status) {
-                    if (status == STATUS_ROLLED_BACK) {
-                        try {
-                            deleteFile(objectName);
-                        } catch (Exception e) {
-                            throw new RuntimeException("Error when deleting a file from MinIO");
-                        }
-                    }
-                }
-            });
-        }
-    }
-
 }
