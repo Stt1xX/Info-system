@@ -4,6 +4,8 @@ import com.example.backend.entities.enums.Role;
 import com.example.backend.security.Sha256PasswordEncoder;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "users")
 public class User {

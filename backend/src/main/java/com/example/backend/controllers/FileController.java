@@ -1,5 +1,6 @@
 package com.example.backend.controllers;
 
+import com.example.backend.queue_managment.FileSender;
 import com.example.backend.servicies.FileService;
 import com.example.backend.servicies.ImportRecordService;
 import org.springframework.http.ResponseEntity;
@@ -12,17 +13,17 @@ import java.io.IOException;
 @RequestMapping("/files")
 public class FileController {
 
-    private final FileService fileService;
     private final ImportRecordService importRecordService;
+    private final FileService fileService;
 
-    public FileController(FileService fileService, ImportRecordService importRecordService) {
-        this.fileService = fileService;
+    public FileController(ImportRecordService importRecordService, FileService fileService) {
         this.importRecordService = importRecordService;
+        this.fileService = fileService;
     }
 
-    @PostMapping("/import")
-    public ResponseEntity<?> importFile(@RequestParam("file") MultipartFile file) throws IOException {
-        return fileService.mainImport(file);
+    @PostMapping("/import/{distributionFlag}")
+    public ResponseEntity<?> importFile(@RequestParam("file") MultipartFile file, @PathVariable Integer distributionFlag) {
+        return fileService.mainImport(file, distributionFlag);
     }
 
     @GetMapping("/history/{pageNumber}")

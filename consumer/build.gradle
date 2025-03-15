@@ -13,6 +13,12 @@ java {
     }
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -39,14 +45,16 @@ dependencies {
     implementation 'com.github.junrar:junrar:7.5.4'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
+    // LOBOK
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 }
-
-bootJar {
-    archiveFileName = 'my-application.jar'
-    mainClass = 'com.example.backend.BackendApplication' // Убедитесь, что это правильный путь к вашему основному классу
-}
-
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = 'consumer.jar'
+    mainClass = 'com.example.consumer.ConsumerApplication'
 }

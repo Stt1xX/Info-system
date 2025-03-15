@@ -1,11 +1,10 @@
-package com.example.backend.servicies;
+package com.example.consumer.services;
 
-import com.example.backend.entities.DTO.CarDTO;
-import com.example.backend.entities.DTO.CoordinatesDTO;
-import com.example.backend.entities.DTO.HumanDTO;
-import com.example.backend.queue_managment.FileSender;
-import com.example.backend.servicies.enums.CounterIndex;
-import com.example.backend.utils.ArchiveProcessor;
+import com.example.consumer.entities.DTO.CarDTO;
+import com.example.consumer.entities.DTO.CoordinatesDTO;
+import com.example.consumer.entities.DTO.HumanDTO;
+import com.example.consumer.services.enums.CounterIndex;
+import com.example.consumer.utils.ArchiveProcessor;
 import com.github.junrar.exception.RarException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,7 +12,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.exception.LockAcquisitionException;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.CannotAcquireLockException;
@@ -24,7 +22,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -47,39 +44,35 @@ public class FileService {
     private final CoordinatesService coordinatesService;
     private final HumanService humanService;
     private final ImportRecordService importRecordService;
-    private final FileSender fileSender;
+
     @Lazy
     @Autowired
     private FileService self;
 
-    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService, FileSender fileSender) {
+    public FileService(CarService carService, CoordinatesService coordinatesService, HumanService humanService, ImportRecordService importRecordService) {
         this.carService = carService;
         this.coordinatesService = coordinatesService;
         this.humanService = humanService;
         this.importRecordService = importRecordService;
-        this.fileSender = fileSender;
     }
 
-    public ResponseEntity<?> mainImport(MultipartFile file, Integer distributionFlag) {
+    public ResponseEntity<?> mainImport(byte[] file, String fileName) throws IOException {
+        File temp_file = createFileFromByteArray(file, fileName);
+        ResponseEntity<?> resp;
         try {
-            if (distributionFlag == 1)
-                return fileSender.send(file);
-            File temp_file = convertMultipartFileToFile(file);
-            ResponseEntity<?> resp;
-            if (ArchiveExtensions.contains(getFileExtension(file))) {
+            if (ArchiveExtensions.contains(getFileExtension(fileName))) {
                 resp = importArchive(temp_file);
-            } else if (fileExtensions.contains(getFileExtension(file))) {
+            } else if (fileExtensions.contains(getFileExtension(fileName))) {
                 resp = self.importFile(temp_file);
             } else {
-                return ResponseEntity.badRequest().body("Incorrect file's extension");
+                resp = ResponseEntity.badRequest().body("Incorrect file's extension");
             }
-            //noinspection ResultOfMethodCallIgnored
-            temp_file.delete();
-            return resp;
-        } catch (Exception ex){
-            return ResponseEntity.badRequest().body("Error during file processing");
+        } catch(DataIntegrityViolationException ex) {
+            resp = new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
+        //noinspection ResultOfMethodCallIgnored
+        temp_file.delete();
+        return resp;
     }
 
 
@@ -87,7 +80,7 @@ public class FileService {
 
         List<File> extractedFiles;
         try {
-             extractedFiles = ArchiveProcessor.extractFiles(archiveFile);
+            extractedFiles = ArchiveProcessor.extractFiles(archiveFile);
         } catch (IOException | RarException e) {
             return ResponseEntity.badRequest().body("Error during archive parsing");
         }
@@ -149,10 +142,10 @@ public class FileService {
                 humans_num = (int[])resp.getBody();
             }
             int humans_num_sum = humans_num != null ? humans_num[CounterIndex.HUMAN.getValue()] : 0,
-                cars_num_sum = (cars_num != null ? cars_num[CounterIndex.CAR.getValue()] : 0)
-                        + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
-                coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
-                        (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
+                    cars_num_sum = (cars_num != null ? cars_num[CounterIndex.CAR.getValue()] : 0)
+                            + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
+                    coords_num_sum = (coords_num != null ? coords_num[CounterIndex.COORDINATES.getValue()] : 0) +
+                            (humans_num != null ? humans_num[CounterIndex.COORDINATES.getValue()] : 0);
             importRecordService.createSuccessRecord(cars_num_sum, humans_num_sum, coords_num_sum);
             return ResponseEntity.ok("The file has been processed successfully!");
 
@@ -223,34 +216,34 @@ public class FileService {
         Map<Integer, HumanDTO> humans = new HashMap<>();
         for (Row row : sheet) {
             try {
-            HumanDTO human = new HumanDTO();
-            human.setName(row.getCell(0).getStringCellValue());
-            human.setSoundtrackName(row.getCell(1).getStringCellValue());
-            human.setImpactSpeed((int) row.getCell(2).getNumericCellValue());
-            human.setMinutesOfWaiting((long) row.getCell(3).getNumericCellValue());
-            human.setWeaponType(row.getCell(4).getStringCellValue());
-            human.setMood(row.getCell(5).getStringCellValue());
-            if (row.getCell(6) != null)
-                human.setRealHero(row.getCell(6).getBooleanCellValue());
-            else
-                human.setRealHero(false);
-            if (row.getCell(7) != null)
-                human.setHasToothpick(row.getCell(7).getBooleanCellValue());
-            else
-                human.setHasToothpick(false);
-            if (row.getCell(8) != null) {
-                human.setCarId((int) row.getCell(8).getNumericCellValue());
-            } else {
-                human.setCarName(row.getCell(10).getStringCellValue());
-                human.setCarIsCool(row.getCell(11).getBooleanCellValue());
-            }
-            if (row.getCell(9) != null) {
-                human.setCoordinatesId((int) row.getCell(9).getNumericCellValue());
-            } else {
-                human.setX(row.getCell(12).getNumericCellValue());
-                human.setY((float) row.getCell(13).getNumericCellValue());
-            }
-            humans.put(row.getRowNum(), human);
+                HumanDTO human = new HumanDTO();
+                human.setName(row.getCell(0).getStringCellValue());
+                human.setSoundtrackName(row.getCell(1).getStringCellValue());
+                human.setImpactSpeed((int) row.getCell(2).getNumericCellValue());
+                human.setMinutesOfWaiting((long) row.getCell(3).getNumericCellValue());
+                human.setWeaponType(row.getCell(4).getStringCellValue());
+                human.setMood(row.getCell(5).getStringCellValue());
+                if (row.getCell(6) != null)
+                    human.setRealHero(row.getCell(6).getBooleanCellValue());
+                else
+                    human.setRealHero(false);
+                if (row.getCell(7) != null)
+                    human.setHasToothpick(row.getCell(7).getBooleanCellValue());
+                else
+                    human.setHasToothpick(false);
+                if (row.getCell(8) != null) {
+                    human.setCarId((int) row.getCell(8).getNumericCellValue());
+                } else {
+                    human.setCarName(row.getCell(10).getStringCellValue());
+                    human.setCarIsCool(row.getCell(11).getBooleanCellValue());
+                }
+                if (row.getCell(9) != null) {
+                    human.setCoordinatesId((int) row.getCell(9).getNumericCellValue());
+                } else {
+                    human.setX(row.getCell(12).getNumericCellValue());
+                    human.setY((float) row.getCell(13).getNumericCellValue());
+                }
+                humans.put(row.getRowNum(), human);
             } catch (IllegalStateException e) {
                 throw new DataIntegrityViolationException("Incorrect file format: Humans: Line " +
                         (row.getRowNum() + 1) + ": " + e.getMessage());
@@ -262,19 +255,19 @@ public class FileService {
         return humans;
     }
 
-    private static String getFileExtension(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
+    private static String getFileExtension(String originalFilename) {
         if (originalFilename != null && originalFilename.contains(".")) {
             return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         }
         return "";
     }
 
-    private static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-        File file = File.createTempFile("upload_", "_" + multipartFile.getOriginalFilename());
+    public static File createFileFromByteArray(byte[] fileContent, String fileName) throws IOException {
+        File file = File.createTempFile("upload_", fileName);
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(multipartFile.getBytes());
+            fos.write(fileContent);
         }
         return file;
     }
 }
+
