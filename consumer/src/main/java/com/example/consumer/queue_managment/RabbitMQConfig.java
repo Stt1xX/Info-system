@@ -1,6 +1,5 @@
 package com.example.consumer.queue_managment;
 
-import com.rabbitmq.client.ConnectionFactory;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;

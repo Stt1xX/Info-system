@@ -1,11 +1,13 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entities.Anntotations.SearchableField;
-import com.example.backend.entities.Anntotations.SortableField;
-import com.example.backend.entities.DTO.PageRequestDTO;
-import com.example.backend.entities.DTO.FieldsDTO;
-import com.example.backend.servicies.ItemService;
-import com.example.backend.utils.Utils;
+
+import com.example.shared_module.entities.Anntotations.SearchableField;
+import com.example.shared_module.entities.Anntotations.SortableField;
+import com.example.shared_module.entities.DTO.FieldsDTO;
+import com.example.shared_module.entities.DTO.PageRequestDTO;
+import com.example.shared_module.servicies.ItemService;
+import com.example.shared_module.servicies.UserService;
+import com.example.shared_module.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +21,18 @@ public abstract class ItemController<ClassDTO, MainClass> {
 
     protected final ItemService<ClassDTO, MainClass> itemService;
     protected final Class<MainClass> mainClass;
+    protected final UserService userService;
 
     @Autowired
-    public ItemController(ItemService<ClassDTO, MainClass> itemService, Class<MainClass> mainClass) {
+    public ItemController(ItemService<ClassDTO, MainClass> itemService, Class<MainClass> mainClass, UserService userService) {
         this.itemService = itemService;
         this.mainClass = mainClass;
+        this.userService = userService;
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody ClassDTO classDTO) {
-        ResponseEntity<?> resp = itemService.add(classDTO);
+        ResponseEntity<?> resp = itemService.add(classDTO, true, userService.getCurrentUser());
         if (resp.getStatusCode() != HttpStatus.OK){
             return resp;
         } else {

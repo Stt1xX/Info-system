@@ -1,7 +1,9 @@
 package com.example.backend.security;
 
-import com.example.backend.entities.User;
-import com.example.backend.repositories.UserRepository;
+
+import com.example.shared_module.entities.User;
+import com.example.shared_module.repositories.UserRepository;
+import com.example.shared_module.utils.Sha256PasswordEncoder;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

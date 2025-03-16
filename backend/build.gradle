@@ -15,6 +15,7 @@ java {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -39,6 +40,8 @@ dependencies {
     implementation 'com.github.junrar:junrar:7.5.4'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
+
+    implementation 'com.example:shared_module:0.0.1-SNAPSHOT'
 }
 
 bootJar {

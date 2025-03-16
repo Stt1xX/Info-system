@@ -1,8 +1,6 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jre
 
 WORKDIR /consumers
-COPY . .
+COPY build/libs/consumer.jar .
 
-RUN ./gradlew build --no-daemon -x test
-
-CMD ["java", "-jar", "build/libs/consumer.jar"]
+CMD ["java", "-jar", "consumer.jar"]
