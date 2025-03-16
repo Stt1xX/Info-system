@@ -37,13 +37,15 @@ export const connect = (itemType) => {
         }
         get(itemType);
         stompClient[itemType].subscribe(`/topic/${getUrlPrefix(itemType)}`, () => {
-            if (itemType === ItemType.CAR) {
-                get(ItemType.CAR_HUMAN_SEARCH);
-            }
-            if (itemType === ItemType.COORDINATES) {
-                get(ItemType.COORDINATES_HUMAN_SEARCH);
-            }
-            get(itemType);
+            setTimeout(() => { // Give the transaction time for complete
+                if (itemType === ItemType.CAR) {
+                    get(ItemType.CAR_HUMAN_SEARCH);
+                }
+                if (itemType === ItemType.COORDINATES) {
+                    get(ItemType.COORDINATES_HUMAN_SEARCH);
+                }
+                get(itemType);
+            }, 500)
         });
     });
 };

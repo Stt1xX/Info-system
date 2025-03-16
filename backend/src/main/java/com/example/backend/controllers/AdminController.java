@@ -1,7 +1,8 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entities.DTO.RegRequestDTO;
-import com.example.backend.servicies.RequestService;
+
+import com.example.shared_module.entities.DTO.RegRequestDTO;
+import com.example.shared_module.servicies.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
