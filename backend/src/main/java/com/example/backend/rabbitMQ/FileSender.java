@@ -39,6 +39,7 @@ public class FileSender {
             }
             jsonResp = rabbitTemplate.convertSendAndReceive(queue.getName(), jsonRequest);
         } catch(AmqpException ex){
+            System.out.println(ex.getMessage());
             return new ResponseEntity<>("RabbitMQ is not responding", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (jsonResp == null) {

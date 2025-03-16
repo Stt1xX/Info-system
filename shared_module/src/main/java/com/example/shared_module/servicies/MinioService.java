@@ -1,5 +1,6 @@
-package com.example.backend.servicies;
-import com.example.backend.utils.Utils;
+package com.example.shared_module.servicies;
+
+import com.example.shared_module.utils.Utils;
 import io.minio.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -1,4 +1,4 @@
-package com.example.backend.servicies;
+package com.example.shared_module.servicies;
 
 import com.example.shared_module.entities.DTO.CarDTO;
 import com.example.shared_module.entities.DTO.CoordinatesDTO;
@@ -13,14 +13,17 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.exception.LockAcquisitionException;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,6 +118,9 @@ public class FileService {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseEntity<?> importFile(File file, User user) {
 
+        RetryContext context = RetrySynchronizationManager.getContext();
+        context.setAttribute("user", user);
+
         if (file == null || !file.exists() || file.length() == 0) {
             return ResponseEntity.badRequest().body("File is empty or does not exist!");
         }
@@ -127,19 +133,19 @@ public class FileService {
             } else {
                 cars_num = (int[]) resp.getBody();
             }
-            resp = coordinatesService.addAll(getCoordinates(workbook));
+            resp = coordinatesService.addAll(getCoordinates(workbook), user);
             if (resp.getStatusCode() != HttpStatus.OK) {
                 throw new DataIntegrityViolationException((String) resp.getBody());
             } else {
                 coords_num = (int[]) resp.getBody();
             }
-            resp = humanService.addAll(getHumans(workbook));
+            resp = humanService.addAll(getHumans(workbook), user);
             if (resp.getStatusCode() != HttpStatus.OK) {
                 throw new DataIntegrityViolationException((String) resp.getBody());
             } else {
                 humans_num = (int[]) resp.getBody();
             }
-            RetryContext context = RetrySynchronizationManager.getContext();
+
             int humans_num_sum = humans_num != null ? humans_num[CounterIndex.HUMAN.getValue()] : 0,
                     cars_num_sum = (cars_num != null ? cars_num[CounterIndex.CAR.getValue()] : 0)
                             + (humans_num != null ? humans_num[CounterIndex.CAR.getValue()] : 0),
@@ -295,7 +301,8 @@ class TransactionListener implements RetryListener {
     @Override
     public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
         if (context.getRetryCount() == FileService.MAX_RETRY_COUNT) {
-            importRecordService.createFailedRecord();
+            User user = (User) context.getAttribute("user");
+            importRecordService.createFailedRecord(user);
         }
         try {
             String fileName = (String) context.getAttribute("fileName");
@@ -314,8 +321,9 @@ class TransactionListener implements RetryListener {
             Integer humans = (Integer) context.getAttribute("humans");
             Integer coords = (Integer) context.getAttribute("coords");
             String fileName = (String) context.getAttribute("fileName");
-            if (cars != null && humans != null && coords != null && fileName != null) {
-                importRecordService.createSuccessRecord(cars, humans, coords, fileName);
+            User user = (User) context.getAttribute("user");
+            if (cars != null && humans != null && coords != null && fileName != null && user != null) {
+                importRecordService.createSuccessRecord(cars, humans, coords, fileName, user);
             }
         }
     }

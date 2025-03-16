@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.servicies.MinioService;
+import com.example.shared_module.servicies.MinioService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
