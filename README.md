@@ -11,6 +11,7 @@
 Проект представляет собой информационную систему, которая позволяет хранить информацию о [людях](images/HumansTable.png "HumansTable") их [автомобилях](images/CarsTable.png "CarsTable") и координатах.
 В системе имеются end-points для [добавления](images/AddHumanForm[PreviewPage].png), удаления, редактирования и просмотра данных. Реализован функционал [aудита](images/AuditWindow.png "AuditWindow") и [администрирования](images/AdminRequests.png "AdminRequests").
 Также сортировка, фильтрация и поиск по данным и [дополнительный функционал](images/AdditionalFunctionality.png "AdditionalFunctionality") по заданию.
+В рамках лр2 и лр3 была добавлена функция импорта файлов с просмотром истории импорта и возможностью скачать импортированные файлы обратно.
 
 ## Backend
 * Написан на *Java*, использует *Spring Boot*.
