@@ -1,10 +1,12 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entities.DTO.HumanDTO;
-import com.example.backend.entities.Human;
-import com.example.backend.entities.enums.Mood;
-import com.example.backend.entities.enums.WeaponType;
-import com.example.backend.servicies.HumanService;
+
+import com.example.shared_module.entities.DTO.HumanDTO;
+import com.example.shared_module.entities.Human;
+import com.example.shared_module.entities.enums.Mood;
+import com.example.shared_module.entities.enums.WeaponType;
+import com.example.shared_module.servicies.HumanService;
+import com.example.shared_module.servicies.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +17,8 @@ import java.util.Arrays;
 public class HumanController extends ItemController<HumanDTO, Human> {
 
     @Autowired
-    public HumanController(HumanService service) {
-        super(service, Human.class);
+    public HumanController(HumanService service, UserService userService) {
+        super(service, Human.class, userService);
     }
 
     @GetMapping("/get_weapon_types")

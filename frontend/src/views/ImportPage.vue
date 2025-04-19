@@ -1,7 +1,13 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gray-900 text-white">
     <main class="flex-grow container mx-auto p-8">
-      <h1 class="text-2xl font-bold mb-6 text-center">Import File</h1>
+      <div class="flex justify-center items-center mb-6 max-w-4xl mx-auto relative">
+        <h1 class="text-2xl font-bold">Import File</h1>
+        <div class="absolute right-0 flex items-center">
+          <input v-model="distributionFlag" type="checkbox" class="ml-4 custom-checkbox"/>
+          <label class="text-white ml-2">Distribution Mode</label>
+        </div>
+      </div>
       <div class="bg-gray-800 p-12 rounded-lg shadow-lg max-w-4xl mx-auto">
         <div class="grid grid-cols-[1fr,1fr,1fr,0.75fr] gap-4 min-h-[72px]">
           <div class="flex items-center justify-center">
@@ -44,6 +50,7 @@ const file = ref(null);
 const fileInput = ref(null);
 const showWarning = ref(false);
 const isHistoryVisible = ref(false);
+const distributionFlag = ref(false);
 
 const closeHistoryWindow = () => {
   isHistoryVisible.value = false;
@@ -68,7 +75,7 @@ const handleSend = () => {
     const formData = new FormData();
     formData.append('file', file.value);
     $.ajax({
-      url: '/files/import',
+      url: `/files/import/${distributionFlag.value ? 1 : 0}`,
       type: 'POST',
       data: formData,
       processData: false,

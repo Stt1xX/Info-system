@@ -1,7 +1,8 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entities.User;
-import com.example.backend.servicies.UserService;
+
+import com.example.shared_module.entities.User;
+import com.example.shared_module.servicies.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

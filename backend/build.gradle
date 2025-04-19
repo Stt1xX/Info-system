@@ -15,10 +15,12 @@ java {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.7.4'
@@ -38,12 +40,8 @@ dependencies {
     implementation 'com.github.junrar:junrar:7.5.4'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
-    // minio
-    implementation 'io.minio:minio:8.5.7'
 
-
-
-
+    implementation 'com.example:shared_module:0.0.1-SNAPSHOT'
 }
 
 bootJar {

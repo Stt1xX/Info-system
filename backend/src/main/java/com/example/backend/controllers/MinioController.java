@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.servicies.MinioService;
+import com.example.shared_module.servicies.MinioService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,19 +16,20 @@ public class MinioController {
         this.minioService = minioService;
     }
 
-    @GetMapping("/download/{fileName}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Integer fileName) {
-        try (InputStream stream = minioService.downloadFile(fileName + "")) {
+    @GetMapping("/download/{recordId}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Integer recordId) {
+        try (InputStream stream = minioService.downloadFile(recordId)) {
             byte[] fileBytes = stream.readAllBytes();
             //set headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDisposition(ContentDisposition.attachment().filename(fileName + ".xlsx").build());
+            headers.setContentDisposition(ContentDisposition.attachment().filename(recordId + ".xlsx").build());
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(fileBytes);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("I'm sorry I can't do that".getBytes());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.backend.controllers;
 
-import com.example.backend.servicies.BusinessLogicService;
+
+import com.example.shared_module.servicies.BusinessLogicService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
